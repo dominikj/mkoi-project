@@ -1,3 +1,5 @@
+<%@ page contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
 <!DOCTYPE html> 
 <html>
 
@@ -36,7 +38,7 @@
     <div id="slideshow_container">  
 	  <div class="slideshow">
 	    <ul class="slideshow">
-          <li class="show"><img width="940" height="250" src="images/home_1.jpg" alt="Podpis cyfrowy jest waÅ¼nÄ skÅadowÄ wspÃ³Åczesnego bezpieczeÅstwa" /></li>
+          <li class="show"><img width="940" height="250" src="images/home_1.jpg" alt="Podpis cyfrowy jest ważną składową współczesnego cyberbezpieczeństwa" /></li>
          <!-- <li><img width="940" height="250" src="images/home_2.jpg" alt="&quot;Enter your caption here&quot;" /></li> -->
         </ul> 
 	  </div><!--close slideshow-->  	
