@@ -10,16 +10,17 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 @Configuration
 public class MvcConfig extends WebMvcConfigurerAdapter {
 
-    @Override
-    public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/").setViewName("home");
-    }
+  @Override
+  public void addViewControllers(ViewControllerRegistry registry) {
+    registry.addViewController("/").setViewName("home");
+    registry.addViewController("/rsapss").setViewName("rsapss");
+  }
 
-    @Bean
-    public InternalResourceViewResolver viewResolver() {
-        InternalResourceViewResolver resolver = new InternalResourceViewResolver();
-        resolver.setPrefix("/");
-        resolver.setSuffix(".jsp");
-        return resolver;
-    }
+  @Bean
+  public InternalResourceViewResolver viewResolver() {
+    InternalResourceViewResolver resolver = new InternalResourceViewResolver();
+    resolver.setPrefix("/");
+    resolver.setSuffix(".jsp");
+    return resolver;
+  }
 }

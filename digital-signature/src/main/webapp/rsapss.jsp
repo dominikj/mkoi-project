@@ -28,8 +28,8 @@
 			<nav>
 				<div id="menubar">
 					<ul id="nav">
-						<li class="current"><a href="/">Home</a></li>
-						<li><a href="/rsapss">RSA-PSS</a></li>
+						<li><a href="home.jsp">Home</a></li>
+						<li class="current" ><a href="/rsapss">RSA-PSS</a></li>
 					</ul>
 				</div>
 				<!--close menubar-->
@@ -42,7 +42,8 @@
 					<li class="show"><img width="940" height="250"
 						src="images/home_1.jpg"
 						alt="Podpis cyfrowy jest ważną składową współczesnego cyberbezpieczeństwa" /></li>
-					 <li><img width="940" height="250" src="images/home_2.jpg" alt="Współczesny człowiek styka się  z cyberbezpieczeństwem w codziennym życiu" /></li>
+					<li><img width="940" height="250" src="images/home_2.jpg"
+						alt="Współczesny człowiek styka się  z cyberbezpieczeństwem w codziennym życiu" /></li>
 				</ul>
 			</div>
 			<!--close slideshow-->
@@ -80,25 +81,27 @@
 
 			<div id="content">
 				<div class="content_item">
-					<h1>Co to jest podpis cyfrowy?</h1>
+					<h1>Algorytm RSA</h1>
 					<p>
-						<b>Podpis cyfrowy</b> — matematyczny sposób sprawdzenia
-						autentyczności dokumentów i wiadomości elektronicznych. Poprawny
-						podpis oznacza, że wiadomość pochodzi od właściwego nadawcy, który
-						nie może zaprzeczyć faktowi jej nadania oraz, że wiadomość nie
-						została zmieniona podczas transmisji.
+						<b>RSA</b> – jeden z pierwszych i obecnie najpopularniejszych
+						asymetrycznych algorytmów kryptograficznych z kluczem publicznym,
+						zaprojektowany w 1977 przez Rona Rivesta, Adi Szamira oraz
+						Leonarda Adlemana. Pierwszy algorytm, który może być stosowany
+						zarówno do szyfrowania jak i do podpisów cyfrowych.
 					</p>
-					<p>Podpis cyfrowy służy zapewnieniu między innymi następujących
-						funkcji bezpieczeństwa:
-					<ul>
-						<li>autentyczności pochodzenia, która daje pewność co do
-							autorstwa dokumentu,</li>
-						<li>niezaprzeczalności, która utrudnia wyparcie się autorstwa
-							lub znajomości treści dokumentu,</li>
-						<li>integralności, która pozwala wykryć nieautoryzowane
-							modyfikacje dokumentu po jego podpisaniu.</li>
-					</ul>
-					</p>
+					<p>Bezpieczeństwo szyfrowania opiera się na trudności
+						faktoryzacji dużych liczb złożonych. Jego nazwa pochodzi od
+						pierwszych liter nazwisk jego twórców</p>
+
+					<p>W przypadku użycia RSA do przeprowadzenia operacji podpisu,
+						szyfruje się zazwyczaj skrót wiadomości za pomocą klucza
+						prywatnego i propaguje taki szyfrogram wraz z oryginalną
+						wiadomością. Odbiorca posiadający klucz publiczny deszyfruje
+						otrzymaną z wiadomością, zaszyfrowaną wartość funkcji skrótu,
+						następnie oblicza wartość tejże funkcji z otrzymanej wiadomości.
+						Jeśli obie wartości się zgadzają, to przyjmuje się, że wiadomość
+						została podpisana poprawnie.</p>
+
 					<div class="content_container">
 						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 							Pellentesque cursus tempor enim. Aliquam facilisis neque non nunc

@@ -6,10 +6,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
-public class MainPageController {
+public class RsapssPageController {
 
-  @RequestMapping(value = "/", method = RequestMethod.GET)
-  public ModelAndView showMainPage() {
-    return new ModelAndView("home");
+  @RequestMapping(value = "/rsapss", method = RequestMethod.GET)
+  public ModelAndView showRsapssPage() {
+    return new ModelAndView("rsapss");
   }
 }
