@@ -20,4 +20,19 @@ public class CryptoFacade {
     return new BigInteger(bitLength, certainty, new SecureRandom());
   }
 
+  /**
+   * Counts number of coprime numbers to pq product in special case, when p, q are primes. In range
+   * 0 < k < p*q there are p−1 distinct multiples of q and q−1 distinct multiples of p, and a bit of
+   * thought shows that these two sets cannot overlap, as any positive number that was a multiple of
+   * both p and q would have to be at least as large as p*q. So, in 0 < k < p*q range are (p*q-1)
+   * number and (q-1) + (p -1) are not coprimes, thus phi(p*q) = (p*q-1) - (q-1) - (p-1) =
+   * (q-1)*(p-1)
+   * 
+   * @param p first prime number
+   * @param q second prime number
+   * @return number of relatively prime numbers
+   */
+  public BigInteger eulerFunction(BigInteger p, BigInteger q) {
+    return p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE));
+  }
 }
