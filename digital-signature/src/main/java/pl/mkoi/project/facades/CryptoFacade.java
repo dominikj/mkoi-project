@@ -32,7 +32,8 @@ public class CryptoFacade {
    * @param q second prime number
    * @return number of relatively prime numbers
    */
-  public BigInteger eulerFunction(BigInteger p, BigInteger q) {
-    return p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE));
+
+  public BigInteger eulerFunction(BigInteger primeP, BigInteger primeQ) {
+    return primeP.subtract(BigInteger.ONE).multiply(primeQ.subtract(BigInteger.ONE));
   }
 }

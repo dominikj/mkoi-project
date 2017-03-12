@@ -21,7 +21,8 @@ public class RsapssAlgorithmService implements SignatureAlgorithmService {
 
   @Override
   public String signFile(byte[] file) {
-    LOGGER.info("Liczba liczb względnie pierwszych: {}",cryptoUtils.eulerFunction(cryptoUtils.getPrimeNumber(512, 4),cryptoUtils.getPrimeNumber(512, 4)));
+    LOGGER.info("Liczba liczb względnie pierwszych: {}", cryptoUtils
+        .eulerFunction(cryptoUtils.getPrimeNumber(512, 4), cryptoUtils.getPrimeNumber(512, 4)));
     return null;
   }
 
