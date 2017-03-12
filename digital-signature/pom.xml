@@ -6,7 +6,7 @@
 	<groupId>pl.mkoi.project</groupId>
 	<artifactId>digital-signature</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<packaging>ejb</packaging>
 
 	<name>digital-signature</name>
 	<description>Projekt realizujący trzy wersje podpisu cyfrowego</description>
