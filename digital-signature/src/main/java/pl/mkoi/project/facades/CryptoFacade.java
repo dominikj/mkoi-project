@@ -1,5 +1,6 @@
 package pl.mkoi.project.facades;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
@@ -67,7 +68,7 @@ public class CryptoFacade {
    * @return signature
    * 
    */
-  @SuppressWarnings("UPM_UNCALLED_PRIVATE_METHOD")
+  
   private byte[] countSignatureDSA(BigInteger primeP, BigInteger primeQ, BigInteger privateKey,
       BigInteger hash) {
     SecureRandom rand = new SecureRandom();
