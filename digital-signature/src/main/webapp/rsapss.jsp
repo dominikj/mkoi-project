@@ -1,4 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://www.springframework.org/tags/form"
+prefix="form"%> <%@ taglib uri="http://java.sun.com/jsp/jstl/core"
+prefix="c"%>
 <!DOCTYPE html>
 <html>
 
@@ -10,6 +13,14 @@
 <link rel="stylesheet" type="text/css" href="css/style.css" />
 <!-- modernizr enables HTML5 elements and feature detects -->
 <script type="text/javascript" src="js/modernizr-1.5.min.js"></script>
+<script type="text/javascript">
+function showLoadedFile(file){
+var pieces = file.value.split('\\'); 
+var filename = pieces[pieces.length-1]; 
+$("#file_info b").html(filename); 
+$("#submit").attr("disabled",false); 
+}
+</script>
 </head>
 
 <body>
@@ -28,8 +39,8 @@
 			<nav>
 				<div id="menubar">
 					<ul id="nav">
-						<li><a href="home.jsp">Home</a></li>
-						<li class="current" ><a href="/rsapss">RSA-PSS</a></li>
+						<li><a href="/">Home</a></li>
+						<li class="current"><a href="/rsapss">RSA-PSS</a></li>
 					</ul>
 				</div>
 				<!--close menubar-->
@@ -103,22 +114,34 @@
 						została podpisana poprawnie.</p>
 
 					<div class="content_container">
-						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-							Pellentesque cursus tempor enim. Aliquam facilisis neque non nunc
-							posuere eget volutpat metus tincidunt.</p>
-						<div class="button_small">
-							<a href="#">Read more</a>
-						</div>
-						<!--close button_small-->
+						<p>
+							<h3>Wybierz plik do podpisania:</h3>
+							<form:form method="POST" enctype="multipart/form-data"
+								action="/sign-file">
+								<table>
+									<tr>
+										<td><input type="file" name="file" id="file"
+											onchange="showLoadedFile(this);" style="display: none;" /></td>
+									</tr>
+									<tr>
+										<td><input type="button" class="button_small"
+											value="Wybierz plik" onclick="$('#file').click(); " /></td>
+									</tr>
+									<tr>
+										<td><input class="button_small" id="submit" type="submit"
+											value="Generuj podpis" disabled="true" /></td>
+									</tr>
+								</table>
+							</form:form>
+						<p id="file_info">Wybrano plik:<b> nie wybrano pliku</b></p>
+						</p>
 					</div>
 					<!--close content_container-->
 					<div class="content_container">
-						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-							Pellentesque cursus tempor enim. Aliquam facilisis neque non nunc
-							posuere eget volutpat metus tincidunt.</p>
-						<div class="button_small">
-							<a href="#">Read more</a>
-						</div>
+						<p><b>Wygenerowany podpis:</b></p>
+					    <div style="border:1px solid black;">
+					    ${fileSignature}
+					    </div>
 						<!--close button_small-->
 					</div>
 					<!--close content_container-->
