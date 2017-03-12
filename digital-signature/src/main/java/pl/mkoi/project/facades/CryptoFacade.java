@@ -36,4 +36,49 @@ public class CryptoFacade {
   public BigInteger eulerFunction(BigInteger primeP, BigInteger primeQ) {
     return primeP.subtract(BigInteger.ONE).multiply(primeQ.subtract(BigInteger.ONE));
   }
+  
+  /**
+   * Generates a generator G which is needed in the DSA algorithm. 
+   * @param p first prime number
+   * @param q second prime number
+   * @return generator G
+   */
+  public BigInteger generateG(BigInteger p, BigInteger q)
+  {
+      BigInteger e = (p.subtract(BigInteger.ONE)).divide(q);
+      BigInteger g = BigInteger.ONE;
+      SecureRandom rand = new SecureRandom();
+      BigInteger h=new BigInteger(p.subtract(BigInteger.ONE).bitLength(), rand);
+      while(!g.equals(BigInteger.ONE))
+      {
+          g=h.modPow(e, p);
+      }
+      return g;
+  }
+  
+  /**
+   * Counts DSA signature
+   * @param primeP first number prime
+   * @param primeQ second number prime
+   * @param privateKey private secret key
+   * @param hash hash of message to signed
+   * @return signature
+   */
+  private byte[] countSignatureDSA(BigInteger primeP, BigInteger primeQ, BigInteger privateKey, BigInteger hash)
+  {
+    SecureRandom rand = new SecureRandom();
+
+    BigInteger secretNumberK = new BigInteger(primeQ.bitLength(), rand);
+    BigInteger invertedK_1 = secretNumberK.modInverse(primeQ);
+    
+    BigInteger generatorG = generateG(primeP,primeQ);
+    BigInteger r = generatorG.modPow(secretNumberK, primeP);
+    r=r.mod(primeQ);  
+    BigInteger s = (invertedK_1.multiply(hash.add(privateKey.multiply(r)))).mod(primeQ); 
+    
+    byte[] Signature = s.toByteArray();
+   
+    return Signature;
+    
+  }
 }
