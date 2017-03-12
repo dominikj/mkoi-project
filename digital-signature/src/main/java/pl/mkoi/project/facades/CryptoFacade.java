@@ -68,7 +68,7 @@ public class CryptoFacade {
    * @return signature
    * 
    */
-  
+  @SuppressFBWarnings("UPM_UNCALLED_PRIVATE_METHOD")
   private byte[] countSignatureDSA(BigInteger primeP, BigInteger primeQ, BigInteger privateKey,
       BigInteger hash) {
     SecureRandom rand = new SecureRandom();
