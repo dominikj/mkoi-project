@@ -64,7 +64,7 @@ public class CryptoFacade {
    * @param hash hash of message to signed
    * @return signature
    */
-  private byte[] countSignatureDSA(BigInteger primeP, BigInteger primeQ, BigInteger privateKey, BigInteger hash)
+  public byte[] countSignatureDSA(BigInteger primeP, BigInteger primeQ, BigInteger privateKey, BigInteger hash)
   {
     SecureRandom rand = new SecureRandom();
 
