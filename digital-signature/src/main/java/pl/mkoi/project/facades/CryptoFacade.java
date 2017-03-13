@@ -1,20 +1,22 @@
 package pl.mkoi.project.facades;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
+import java.security.MessageDigest;
 import java.security.SecureRandom;
+
 
 @Component
 public class CryptoFacade {
 
   /**
    * Returns prime number with 1 - 2**-100 probability.
+   * 
    * @param bitLength - size of number
    * @return returns prime number
    */
-  private BigInteger getPrimeNumber(int bitLength) {
+  public BigInteger getPrimeNumber(int bitLength) {
     return BigInteger.probablePrime(bitLength, new SecureRandom());
   }
 
@@ -35,52 +37,43 @@ public class CryptoFacade {
   }
 
   /**
-   * Generates a generator G which is needed in the DSA algorithm.
+   * Makes hash SHA2-256
    * 
-   * @param p first prime number
-   * @param q second prime number
-   * @return generator G
+   * @param message message to hash
+   * @return 32B hash of message
    */
-  public BigInteger generateG(BigInteger p, BigInteger q) {
-    BigInteger e = (p.subtract(BigInteger.ONE)).divide(q);
-    BigInteger g = BigInteger.ONE;
-    //FIXME: please use getPrimeNumber() method - better probability
-    SecureRandom rand = new SecureRandom();
-    BigInteger h = new BigInteger(p.subtract(BigInteger.ONE).bitLength(), rand);
-    while (!g.equals(BigInteger.ONE)) {
-      g = h.modPow(e, p);
+  public byte[] hash(byte[] message) {
+    MessageDigest md;
+    try {
+      md = MessageDigest.getInstance("SHA-256");
+      md.update(message);
+      return md.digest();
+    } catch (Exception e) {
+
+      e.printStackTrace();
+      byte[] x = null;
+      return x;
     }
-    return g;
+
   }
 
   /**
-   * Counts DSA signature
+   * converts byte array to hexadecimal string
    * 
-   * @param primeP first number prime
-   * @param primeQ second number prime
-   * @param privateKey private secret key
-   * @param hash hash of message to signed
-   * @return signature
-   * 
+   * @param array byte array
+   * @return hexadecimal array
    */
+  public String byteArrayToString(byte[] array) {
 
-  public byte[] countSignatureDSA(BigInteger primeP, BigInteger primeQ, BigInteger privateKey, BigInteger hash)
-  {
+    StringBuffer result = new StringBuffer();
+    for (byte b : array) {
+      result.append(String.format("%02X", b));
 
-    SecureRandom rand = new SecureRandom();
-    //FIXME: please use getPrimeNumber() method - better probability
-    BigInteger secretNumberK = new BigInteger(primeQ.bitLength(), rand);
-    BigInteger invertedK_1 = secretNumberK.modInverse(primeQ);
+    }
+    return result.toString();
 
-    BigInteger generatorG = generateG(primeP, primeQ);
-    BigInteger r = generatorG.modPow(secretNumberK, primeP);
-    r = r.mod(primeQ);
-    BigInteger s = (invertedK_1.multiply(hash.add(privateKey.multiply(r)))).mod(primeQ);
-
-    byte[] Signature = s.toByteArray();
-
-    return Signature;
   }
+
 
   /**
    * Generates public and private key pair.
