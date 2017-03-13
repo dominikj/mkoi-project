@@ -63,14 +63,10 @@ public class CryptoFacade {
    * @return signature
    * 
    */
-<<<<<<< HEAD
+
   public byte[] countSignatureDSA(BigInteger primeP, BigInteger primeQ, BigInteger privateKey, BigInteger hash)
   {
-=======
-  @SuppressFBWarnings("UPM_UNCALLED_PRIVATE_METHOD")
-  private byte[] countSignatureDSA(BigInteger primeP, BigInteger primeQ, BigInteger privateKey,
-      BigInteger hash) {
->>>>>>> origin/master
+
     SecureRandom rand = new SecureRandom();
     //FIXME: please use getPrimeNumber() method - better probability
     BigInteger secretNumberK = new BigInteger(primeQ.bitLength(), rand);
