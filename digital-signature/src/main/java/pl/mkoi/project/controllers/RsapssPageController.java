@@ -3,6 +3,7 @@ package pl.mkoi.project.controllers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +23,7 @@ public class RsapssPageController {
   private final SignatureAlgorithmService signService;
 
   @Autowired
-  public RsapssPageController(SignatureAlgorithmService signService) {
+  public RsapssPageController(@Qualifier("RsapssAlgorithmService") SignatureAlgorithmService signService) {
     this.signService = signService;
   }
 
