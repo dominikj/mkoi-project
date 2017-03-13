@@ -9,23 +9,17 @@ import java.security.SecureRandom;
 @Component
 public class CryptoFacade {
 
-  private static final int CERTAINTY = 4;
-
   /**
-   * 
+   * Returns prime number with 1 - 2**-100 probability.
    * @param bitLength - size of number
-   * @param certainty - a measure of the uncertainty that the caller is willing to tolerate: if the
-   *        call returns true the probability that this BigInteger is prime exceeds (1 -
-   *        1/2certainty). The execution time of this method is proportional to the value of this
-   *        parameter.
    * @return returns prime number
    */
-  public BigInteger getPrimeNumber(int bitLength, int certainty) {
-    return new BigInteger(bitLength, certainty, new SecureRandom());
+  private BigInteger getPrimeNumber(int bitLength) {
+    return BigInteger.probablePrime(bitLength, new SecureRandom());
   }
 
   /**
-   * Counts number of coprime numbers to pq product in special case, when p, q are primes. In range
+   * Counts number of coprime numbers to p*q product in special case, when p, q are primes. In range
    * 0 < k < p*q there are p−1 distinct multiples of q and q−1 distinct multiples of p, and a bit of
    * thought shows that these two sets cannot overlap, as any positive number that was a multiple of
    * both p and q would have to be at least as large as p*q. So, in 0 < k < p*q range are (p*q-1)
@@ -50,6 +44,7 @@ public class CryptoFacade {
   public BigInteger generateG(BigInteger p, BigInteger q) {
     BigInteger e = (p.subtract(BigInteger.ONE)).divide(q);
     BigInteger g = BigInteger.ONE;
+    //FIXME: please use getPrimeNumber() method - better probability
     SecureRandom rand = new SecureRandom();
     BigInteger h = new BigInteger(p.subtract(BigInteger.ONE).bitLength(), rand);
     while (!g.equals(BigInteger.ONE)) {
@@ -72,7 +67,7 @@ public class CryptoFacade {
   private byte[] countSignatureDSA(BigInteger primeP, BigInteger primeQ, BigInteger privateKey,
       BigInteger hash) {
     SecureRandom rand = new SecureRandom();
-
+    //FIXME: please use getPrimeNumber() method - better probability
     BigInteger secretNumberK = new BigInteger(primeQ.bitLength(), rand);
     BigInteger invertedK_1 = secretNumberK.modInverse(primeQ);
 
@@ -88,19 +83,20 @@ public class CryptoFacade {
 
   /**
    * Generates public and private key pair.
+   * 
    * @param publicKey public key
    * @param privateKey private key
    * @param bitLength keys length in bits
    */
   public void generateKeys(Key publicKey, Key privateKey, int bitLength) {
-    BigInteger primeP = getPrimeNumber(bitLength / 2, CERTAINTY);
-    BigInteger primeQ = getPrimeNumber(bitLength / 2, CERTAINTY);
+    BigInteger primeP = getPrimeNumber(bitLength / 2);
+    BigInteger primeQ = getPrimeNumber(bitLength / 2);
     BigInteger phi = eulerFunction(primeP, primeQ);
 
     // Gets coprime number from 0 < e < phi(p*q)
     // Gets randomly prime number which may be coprime to phi, thus we need to do primality test. If
     // number is not coprime, increments it and tests again
-    BigInteger primeE = getPrimeNumber(bitLength, 4);
+    BigInteger primeE = getPrimeNumber(bitLength);
     while (phi.gcd(primeE).compareTo(BigInteger.ONE) > 0 && primeE.compareTo(phi) < 0) {
       primeE = primeE.add(BigInteger.ONE);
     }
@@ -110,7 +106,7 @@ public class CryptoFacade {
     // Public key is (n,e)
     publicKey.setModulus(factorN);
     publicKey.setExponent(primeE);
-    
+
     // Solves d*e = 1*(mod phi)
     BigInteger factorD = primeE.modInverse(phi);
     // Private key is (n,d)
