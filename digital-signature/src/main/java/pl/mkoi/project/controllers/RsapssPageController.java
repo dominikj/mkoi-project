@@ -23,7 +23,8 @@ public class RsapssPageController {
   private final SignatureAlgorithmService signService;
 
   @Autowired
-  public RsapssPageController(@Qualifier("RsapssAlgorithmService") SignatureAlgorithmService signService) {
+  public RsapssPageController(
+      @Qualifier("RsapssAlgorithmService") SignatureAlgorithmService signService) {
     this.signService = signService;
   }
 
@@ -33,7 +34,8 @@ public class RsapssPageController {
   }
 
   /**
-   * Method gets request with file for signing. 
+   * Method gets request with file for signing.
+   * 
    * @param file - file obtained from user
    * @param model - model data
    * @return - rsa-pss view

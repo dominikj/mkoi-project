@@ -22,11 +22,11 @@ public class DsaAlgorithmService implements SignatureAlgorithmService {
   private final CryptoFacade cryptoUtils;
   private static final Logger LOGGER = LoggerFactory.getLogger(RsapssAlgorithmService.class);
   /**
-   * length (number of bits) of primeP
+   * length (number of bits) of primeP.
    */
   private static final int N = 2048;
   /**
-   * length (number of bits) of primeQ
+   * length (number of bits) of primeQ.
    */
   private static final int L = 256;
 
@@ -39,14 +39,14 @@ public class DsaAlgorithmService implements SignatureAlgorithmService {
   @Override
   public String signFile(byte[] file) {
 
-    KeyPair keyPair = generateKeysDSA();
+    KeyPair keyPair = generateKeysDsa();
     DSAPrivateKey privateKey = (DSAPrivateKey) keyPair.getPrivate();
     DSAPublicKey publicKey = (DSAPublicKey) keyPair.getPublic();
 
     LOGGER.info("Pub key :{}", publicKey.getY().toString());
     LOGGER.info("Priv key :{}", privateKey.getX().toString());
 
-    byte[] signatureB = countSignatureDSA(cryptoUtils.getPrimeNumber(N),
+    byte[] signatureB = countSignatureDsa(cryptoUtils.getPrimeNumber(N),
         cryptoUtils.getPrimeNumber(L), privateKey.getX(), hash(file));
     String signature = cryptoUtils.byteArrayToString(signatureB);
 
@@ -54,11 +54,11 @@ public class DsaAlgorithmService implements SignatureAlgorithmService {
   }
 
   /**
-   * Generates KeyPair
+   * Generates KeyPair.
    * 
    * @return KeyPair
    */
-  public KeyPair generateKeysDSA() {
+  public KeyPair generateKeysDsa() {
 
     KeyPairGenerator keyGen;
     try {
@@ -83,20 +83,20 @@ public class DsaAlgorithmService implements SignatureAlgorithmService {
    * @param q second prime number
    * @return generator G
    */
-  private BigInteger generateG(BigInteger p, BigInteger q) {
-    BigInteger e = (p.subtract(BigInteger.ONE)).divide(q);
-    BigInteger g = BigInteger.ONE;
+  private BigInteger generateG(BigInteger numberP, BigInteger numberQ) {
+    BigInteger numberE = (numberP.subtract(BigInteger.ONE)).divide(numberQ);
+    BigInteger numberG = BigInteger.ONE;
     SecureRandom rand = new SecureRandom();
-    while (g.equals(BigInteger.ONE)) {
-      BigInteger h = new BigInteger(p.subtract(BigInteger.ONE).bitLength(), rand);
-      g = h.modPow(e, p);
+    while (numberG.equals(BigInteger.ONE)) {
+      BigInteger numberH = new BigInteger(numberP.subtract(BigInteger.ONE).bitLength(), rand);
+      numberG = numberH.modPow(numberE, numberP);
     }
-    return g;
+    return numberG;
   }
 
 
   /**
-   * Counts DSA signature
+   * Counts DSA signature.
    * 
    * @param primeP first number prime
    * @param primeQ second number prime
@@ -105,34 +105,34 @@ public class DsaAlgorithmService implements SignatureAlgorithmService {
    * @return signature
    * 
    */
-  private byte[] countSignatureDSA(BigInteger primeP, BigInteger primeQ, BigInteger privateKey,
+  private byte[] countSignatureDsa(BigInteger primeP, BigInteger primeQ, BigInteger privateKey,
       BigInteger hash) {
 
     SecureRandom rand = new SecureRandom();
     BigInteger secretNumberK = new BigInteger(primeQ.bitLength(), rand);
-    BigInteger invertedK_1 = secretNumberK.modInverse(primeQ);
+    BigInteger invertedK1 = secretNumberK.modInverse(primeQ);
 
     BigInteger generatorG = generateG(primeP, primeQ);
-    BigInteger r = generatorG.modPow(secretNumberK, primeP);
-    r = r.mod(primeQ);
-    BigInteger s = (invertedK_1.multiply(hash.add(privateKey.multiply(r)))).mod(primeQ);
+    BigInteger numberR = generatorG.modPow(secretNumberK, primeP);
+    numberR = numberR.mod(primeQ);
+    BigInteger numberS = (invertedK1.multiply(hash.add(privateKey.multiply(numberR)))).mod(primeQ);
 
-    byte[] Signature = s.toByteArray();
+    byte[] signature = numberS.toByteArray();
 
-    return Signature;
+    return signature;
   }
 
   /**
-   * Creats hash of message and converts the result to BigInteger
+   * Creats hash of message and converts the result to BigInteger.
    * 
    * @param message message to hash
    * @return hash in BigInteger
    */
   private BigInteger hash(byte[] message) {
     byte[] hash = cryptoUtils.hash(message);
-    BigInteger hashBI = new BigInteger(hash);
-    LOGGER.info("Hash in Integer :{}", hashBI.toString());
-    return hashBI;
+    BigInteger hashBi = new BigInteger(hash);
+    LOGGER.info("Hash in Integer :{}", hashBi.toString());
+    return hashBi;
   }
 
 
