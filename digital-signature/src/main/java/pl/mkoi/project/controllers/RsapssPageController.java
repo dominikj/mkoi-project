@@ -13,10 +13,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+import pl.mkoi.project.builders.ZipBuilder;
+import pl.mkoi.project.keys.KeyPair;
 import pl.mkoi.project.services.SignatureAlgorithmService;
 import pl.mkoi.project.services.impl.RsapssAlgorithmService;
 
 import java.nio.charset.Charset;
+import java.time.LocalDateTime;
 
 @Controller
 @RequestMapping(value = "/rsapss")
@@ -59,6 +62,33 @@ public class RsapssPageController extends PageController {
 
     return new HttpEntity<byte[]>(fileSignature,
         prepareHeaders(fileSignature.length, filename, MediaType.TEXT_PLAIN));
+
+  }
+
+  /**
+   * Generates zip file with keys.
+   * 
+   * @return zip file
+   */
+  @RequestMapping(value = "/generate-keys", method = RequestMethod.GET)
+  @ResponseBody
+  public HttpEntity<byte[]> generateKeys() {
+
+    KeyPair keys = signService.genarateKeys(1024);
+    ZipBuilder builder = getZipBuilder();
+
+    builder.addFile("private_key.txt",
+        keys.getPrivateKey().toString().getBytes(Charset.defaultCharset()));
+
+    builder.addFile("public_key.txt",
+        keys.getPublicKey().toString().getBytes(Charset.defaultCharset()));
+
+    String filename = "Keys_".concat(LocalDateTime.now().toString().concat(".zip"));
+
+    byte[] zipFile = builder.build();
+
+    return new HttpEntity<byte[]>(zipFile,
+        prepareHeaders(zipFile.length, filename, MediaType.MULTIPART_FORM_DATA));
 
   }
 }

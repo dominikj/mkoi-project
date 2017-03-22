@@ -30,4 +30,10 @@ public class RsaKey {
     this.exponent = exponent;
   }
 
+  @Override
+  public String toString() {
+    return modulus.toString().concat(";").concat(exponent.toString());
+
+  }
+
 }

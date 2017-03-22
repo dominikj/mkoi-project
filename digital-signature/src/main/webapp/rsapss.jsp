@@ -188,8 +188,14 @@ function openCity(evt, cityName) {
 					</div>
 
 					<div id="Keys" class="tabcontent">
-						<h3>Generacja kluczy</h3>
-						<p>----</p>
+
+						<h3>Generacja pary kluczy</h3>
+						Wygeneruj nową parę kluczy
+						<form:form method="GET" action="/rsapss/generate-keys">
+							<p>
+								<input type="submit" value="Generuj" />
+							</p>
+						</form:form>
 					</div>
 
 					<div id="Verify" class="tabcontent">
