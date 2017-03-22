@@ -14,27 +14,24 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import pl.mkoi.project.services.SignatureAlgorithmService;
-import pl.mkoi.project.services.impl.RsapssAlgorithmService;
-
-import java.nio.charset.Charset;
+import pl.mkoi.project.services.impl.DsaAlgorithmService;
 
 @Controller
-@RequestMapping(value = "/rsapss")
-public class RsapssPageController extends PageController {
+@RequestMapping("/dsa")
+public class DsaPageController extends PageController {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(RsapssPageController.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DsaPageController.class);
 
   private final SignatureAlgorithmService signService;
 
   @Autowired
-  public RsapssPageController(
-      @Qualifier("RsapssAlgorithmService") RsapssAlgorithmService signService) {
+  public DsaPageController(@Qualifier("DsaAlgorithmService") DsaAlgorithmService signService) {
     this.signService = signService;
   }
 
   @RequestMapping(value = "", method = RequestMethod.GET)
   public ModelAndView showRsapssPage() {
-    return new ModelAndView("rsapss");
+    return new ModelAndView("dsa");
   }
 
   /**
@@ -48,17 +45,13 @@ public class RsapssPageController extends PageController {
   public HttpEntity<byte[]> signFile(@RequestParam("file") MultipartFile file,
       @RequestParam("key") MultipartFile key) {
 
-    LOGGER.info("Rozpoczęto podpisywanie pliku: {} kluczem: {}", file.getOriginalFilename(),
-        key.getOriginalFilename());
-
-    // Mocked
-    // signService.signFile(file.getBytes(), key);
-    byte[] fileSignature = "8787678AB7776CD87676F".getBytes(Charset.defaultCharset());
-
-    String filename = "sign_".concat(file.getOriginalFilename()).concat(".txt");
+    byte[] fileSignature = new byte[0];
+    String filename = "";
 
     return new HttpEntity<byte[]>(fileSignature,
         prepareHeaders(fileSignature.length, filename, MediaType.TEXT_PLAIN));
 
   }
+
+
 }

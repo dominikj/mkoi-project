@@ -1,16 +1,23 @@
 package pl.mkoi.project.services.impl;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 import pl.mkoi.project.facades.CryptoFacade;
+import pl.mkoi.project.keys.DsaKeyPair;
+import pl.mkoi.project.keys.KeyPair;
 import pl.mkoi.project.services.SignatureAlgorithmService;
 
 import java.math.BigInteger;
+import java.nio.charset.Charset;
 import java.security.SecureRandom;
 
 @Component("DsaAlgorithmService")
+@PropertySource("configuration-default.properties")
 public class DsaAlgorithmService implements SignatureAlgorithmService {
 
   private final CryptoFacade cryptoUtils;
@@ -18,11 +25,13 @@ public class DsaAlgorithmService implements SignatureAlgorithmService {
   /**
    * length (number of bits) of primeP.
    */
-  private static final int N = 2048;
+  @Value("${dsa.prime.n}")
+  private int primeN;
   /**
    * length (number of bits) of primeQ.
    */
-  private static final int L = 256;
+  @Value("${dsa.prime.l}")
+  private int primeL;
   private BigInteger primeP;
   private BigInteger primeQ;
   private BigInteger generatorG;
@@ -30,23 +39,34 @@ public class DsaAlgorithmService implements SignatureAlgorithmService {
   @Autowired
   public DsaAlgorithmService(CryptoFacade cryptoUtils) {
     this.cryptoUtils = cryptoUtils;
-  
+
   }
 
   @Override
-  public String signFile(byte[] file) {
+  public byte[] signFile(byte[] file, KeyPair keys) {
 
     generateParameters();
     KeyPair keypair = this.generateKeysDsa(primeP, primeQ, generatorG);
 
-    LOGGER.info("Pub key :{}", keypair.publicKey.toString());
-    LOGGER.info("Priv key :{}", keypair.privateKey.toString());
+    LOGGER.info("Pub key :{}", keypair.getPublicKey().toString());
+    LOGGER.info("Priv key :{}", keypair.getPrivateKey().toString());
 
-    Signature signature =
-        countSignatureDsa(primeP, primeQ, generatorG, keypair.privateKey, hash(file));
+    Signature signature = countSignatureDsa(primeP, primeQ, generatorG,
+        (BigInteger) keypair.getPrivateKey(), hash(file));
 
+    return signature.toString().getBytes(Charset.defaultCharset());
+  }
 
-    return signature.toString();
+  @Override
+  public KeyPair genarateKeys(int keySize) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public boolean verifySign(byte[] file, byte[] sign, KeyPair keys) {
+    // TODO Auto-generated method stub
+    return false;
   }
 
   /**
@@ -54,16 +74,15 @@ public class DsaAlgorithmService implements SignatureAlgorithmService {
    * 
    * @return KeyPair
    */
-  public KeyPair generateKeysDsa(BigInteger generatorG, BigInteger primeP, BigInteger primeQ) {
+  private KeyPair generateKeysDsa(BigInteger generatorG, BigInteger primeP, BigInteger primeQ) {
 
     SecureRandom rand = new SecureRandom();
-    BigInteger ctmp = new BigInteger(N + 64, rand);
+    BigInteger ctmp = new BigInteger(primeN + 64, rand);
 
     BigInteger privateX = (ctmp.mod(primeQ.subtract(BigInteger.ONE))).add(BigInteger.ONE);
     BigInteger publicY = generatorG.modPow(privateX, primeP);
 
-    return new KeyPair(privateX, publicY);
-
+    return new DsaKeyPair(privateX, publicY);
 
   }
 
@@ -71,8 +90,8 @@ public class DsaAlgorithmService implements SignatureAlgorithmService {
    * Generates parameters for algorithms DSA.
    */
   private void generateParameters() {
-    primeQ = cryptoUtils.getPrimeNumber(N);
-    primeP = generateP(primeQ, L);
+    primeQ = cryptoUtils.getPrimeNumber(primeN);
+    primeP = generateP(primeQ, primeL);
     generatorG = this.generateG(primeP, primeQ);
   }
 
@@ -80,7 +99,7 @@ public class DsaAlgorithmService implements SignatureAlgorithmService {
    * Generates primeP that (primeP-1)%primeQ = 0.
    * 
    * @param primeQ primeQ
-   * @param L length of primeP (in number of bits)
+   * @param primeL length of primeP (in number of bits)
    * @return primeP
    */
   private BigInteger generateP(BigInteger primeQ, int length) {
@@ -95,7 +114,6 @@ public class DsaAlgorithmService implements SignatureAlgorithmService {
     } while (!p1.isProbablePrime(20));
     return p1;
   }
-
 
   /**
    * Generates a generator G which is needed in the DSA algorithm.
@@ -119,7 +137,6 @@ public class DsaAlgorithmService implements SignatureAlgorithmService {
     return numberG;
   }
 
-
   /**
    * Counts DSA signature.
    * 
@@ -136,13 +153,10 @@ public class DsaAlgorithmService implements SignatureAlgorithmService {
     SecureRandom rand = new SecureRandom();
     BigInteger secretNumberK = new BigInteger(primeQ.bitLength(), rand);
 
-
     BigInteger numberR = generatorG.modPow(secretNumberK, primeP);
     numberR = numberR.mod(primeQ);
     BigInteger numberS = ((secretNumberK.modInverse(primeQ))
         .multiply(hash.add(privateKey.multiply(numberR)).mod(primeQ))).mod(primeQ);
-
-
 
     return new Signature(numberS, numberR);
   }
@@ -172,11 +186,10 @@ public class DsaAlgorithmService implements SignatureAlgorithmService {
    * @param file file
    * @return verification
    */
-  public boolean verifySignature(BigInteger signatureS, BigInteger signatureR, BigInteger publicKey,
-      BigInteger primeP, BigInteger primeQ, BigInteger generatorG, byte[] file) {
-
-   
- 
+  @SuppressFBWarnings
+  private boolean verifySignature(BigInteger signatureS, BigInteger signatureR,
+      BigInteger publicKey, BigInteger primeP, BigInteger primeQ, BigInteger generatorG,
+      byte[] file) {
 
     if (signatureR.compareTo(primeQ) >= 0) {
       return false;
@@ -198,20 +211,7 @@ public class DsaAlgorithmService implements SignatureAlgorithmService {
       return true;
     }
 
-
     return false;
-
-  }
-
-
-  private static class KeyPair {
-    public BigInteger privateKey;
-    public BigInteger publicKey;
-
-    public KeyPair(BigInteger privateKey, BigInteger publicKey) {
-      this.privateKey = privateKey;
-      this.publicKey = publicKey;
-    }
 
   }
 
@@ -235,6 +235,5 @@ public class DsaAlgorithmService implements SignatureAlgorithmService {
     }
 
   }
-
 
 }

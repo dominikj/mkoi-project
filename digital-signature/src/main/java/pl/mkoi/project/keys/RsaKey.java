@@ -1,18 +1,18 @@
-package pl.mkoi.project.facades;
+package pl.mkoi.project.keys;
 
 import java.math.BigInteger;
 
-public class Key {
+public class RsaKey {
 
   private BigInteger modulus;
   private BigInteger exponent;
 
-  public Key(BigInteger modulus, BigInteger exponent) {
+  public RsaKey(BigInteger modulus, BigInteger exponent) {
     this.modulus = modulus;
     this.exponent = exponent;
   }
 
-  public Key() {}
+  public RsaKey() {}
 
   public BigInteger getModulus() {
     return modulus;

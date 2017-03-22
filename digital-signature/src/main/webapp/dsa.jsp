@@ -78,8 +78,8 @@ function openCity(evt, cityName) {
 				<div id="menubar">
 					<ul id="nav">
 						<li><a href="/">Home</a></li>
-						<li class="current"><a href="/rsapss">RSA-PSS</a></li>
-						<li><a href="/dsa">DSA</a></li>
+						<li><a href="/rsapss">RSA-PSS</a></li>
+						<li class="current"><a href="/dsa">DSA</a></li>
 					</ul>
 				</div>
 				<!--close menubar-->
@@ -131,26 +131,21 @@ function openCity(evt, cityName) {
 
 			<div id="content">
 				<div class="content_item">
-					<h1>Algorytm RSA</h1>
-					<p>
-						<b>RSA</b> – jeden z pierwszych i obecnie najpopularniejszych
-						asymetrycznych algorytmów kryptograficznych z kluczem publicznym,
-						zaprojektowany w 1977 przez Rona Rivesta, Adi Szamira oraz
-						Leonarda Adlemana. Pierwszy algorytm, który może być stosowany
-						zarówno do szyfrowania jak i do podpisów cyfrowych.
-					</p>
-					<p>Bezpieczeństwo szyfrowania opiera się na trudności
-						faktoryzacji dużych liczb złożonych. Jego nazwa pochodzi od
-						pierwszych liter nazwisk jego twórców</p>
+					<h1>Lorem ipsum dolor sit amet</h1>
+					<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+						Proin nibh augue, suscipit a, scelerisque sed, lacinia in, mi.
+						Cras vel lorem. Etiam pellentesque aliquet tellus. Phasellus
+						pharetra nulla ac diam. Quisque semper justo at risus. Donec
+						venenatis, turpis vel hendrerit interdum, dui ligula ultricies
+						purus, sed posuere libero dui id orci. Nam congue, pede vitae
+						dapibus aliquet, elit magna vulputate arcu, vel tempus metus leo
+						non est. Etiam sit amet lectus quis est congue mollis. Phasellus
+						congue lacus eget neque. Phasellus ornare, ante vitae consectetuer
+						consequat, purus sapien ultricies dolor, et mollis pede metus eget
+						nisi. Praesent sodales velit quis augue. Cras suscipit, urna at
+						aliquam rhoncus, urna quam viverra nisi, in interdum massa nibh
+						nec erat.</p>
 
-					<p>W przypadku użycia RSA do przeprowadzenia operacji podpisu,
-						szyfruje się zazwyczaj skrót wiadomości za pomocą klucza
-						prywatnego i propaguje taki szyfrogram wraz z oryginalną
-						wiadomością. Odbiorca posiadający klucz publiczny deszyfruje
-						otrzymaną z wiadomością, zaszyfrowaną wartość funkcji skrótu,
-						następnie oblicza wartość tejże funkcji z otrzymanej wiadomości.
-						Jeśli obie wartości się zgadzają, to przyjmuje się, że wiadomość
-						została podpisana poprawnie.</p>
 
 					<div class="tab">
 						<button class="tablinks" onclick="openCity(event, 'Sign')">Podpis</button>
@@ -161,7 +156,7 @@ function openCity(evt, cityName) {
 					<div id="Sign" class="tabcontent">
 						<h3>Generacja podpisu pliku</h3>
 						<form:form method="POST" enctype="multipart/form-data"
-							action="/rsapss/sign-file">
+							action="/dsa/sign-file">
 							<table>
 								<tr>
 									<td><input type="file" name="file" id="file"

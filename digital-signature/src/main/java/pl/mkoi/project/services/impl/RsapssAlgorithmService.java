@@ -5,99 +5,118 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pl.mkoi.project.facades.CryptoFacade;
-import pl.mkoi.project.facades.Key;
+import pl.mkoi.project.keys.KeyPair;
+import pl.mkoi.project.keys.RsaKey;
 import pl.mkoi.project.services.SignatureAlgorithmService;
 
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-import java.nio.charset.Charset;
+import java.security.InvalidParameterException;
+import java.security.SecureRandom;
+import java.util.Arrays;
 
 
 @Component("RsapssAlgorithmService")
 public class RsapssAlgorithmService implements SignatureAlgorithmService {
 
+  private final RsaCryptoService rsaService;
   private final CryptoFacade cryptoUtils;
   private static final Logger LOGGER = LoggerFactory.getLogger(RsapssAlgorithmService.class);
-  private static final int BITS_OF_EXPONENT = 6;
 
   @Autowired
-  public RsapssAlgorithmService(CryptoFacade cryptoUtils) {
+  public RsapssAlgorithmService(RsaCryptoService rsaService, CryptoFacade cryptoUtils) {
+    this.rsaService = rsaService;
     this.cryptoUtils = cryptoUtils;
   }
 
   @Override
-  public String signFile(byte[] file) {
-    Key pub = new Key();
-    Key priv = new Key();
-
-    generateKeys(pub, priv, 1024);
-    LOGGER.info("Pub key :{} {}", pub.getExponent(), pub.getModulus());
-    LOGGER.info("Priv key :{} {}", priv.getExponent(), priv.getModulus());
-    // test
-    byte[] message = {34, 54, 45, 65, 76, 87, 98, 43};
-    byte[] enc = encrypt(message, priv);
-    byte[] dec = decrypt(enc, pub);
-    LOGGER.info("Test: {}", dec);
-
-    return null;
+  public byte[] signFile(byte[] file, KeyPair keys) {
+    byte[] sign = encode(file);
+    
+    return rsaService.encrypt(sign, (RsaKey) keys.getPrivateKey());
   }
 
-  /**
-   * Generates public and private key pair.
-   * 
-   * @param publicKey public key
-   * @param privateKey private key
-   * @param bitLength keys length in bits
-   */
-  private void generateKeys(Key publicKey, Key privateKey, int bitLength) {
-    BigInteger primeP = cryptoUtils.getPrimeNumber(bitLength / 2);
-    BigInteger primeQ = cryptoUtils.getPrimeNumber(bitLength / 2);
-    BigInteger phi = eulerFunction(primeP, primeQ);
+  private byte[] encode(byte[] message) {
+    // mHash = Hash(m)
+    byte[] mhash = cryptoUtils.hash(message);
 
-    // Gets coprime number from 0 < e < phi(p*q)
-    // Gets randomly prime number which may be coprime to phi, thus we need to do primality test. If
-    // number is not coprime, increments it and tests again
-    BigInteger primeE = cryptoUtils.getPrimeNumber(BITS_OF_EXPONENT);
-    while (phi.gcd(primeE).compareTo(BigInteger.ONE) > 0 && primeE.compareTo(phi) < 0) {
-      primeE = primeE.add(BigInteger.ONE);
+    // From RFC 3447 “Typical salt lengths in octets are hLen (the length of the output of the hash
+    // function Hash) and 0"
+    int saltLength = mhash.length;
+
+    int emLength = 1024 / 8;
+
+    BigInteger salt = new BigInteger(saltLength * 8, new SecureRandom());
+
+    // zero-byte series is used as a padding
+    byte[] padding1 = new byte[8];
+    // m' = padding || mHash || salt
+    byte[] messagePrime = cryptoUtils.concatenateArrays(padding1, mhash, salt.toByteArray());
+    // H = Hash(m')
+    byte[] hashPrime = cryptoUtils.hash(messagePrime);
+
+    // PS
+    byte[] padding2 = new byte[emLength - 2 * saltLength - 2];
+    // DB = PS || 0x01 || salt
+    byte[] dbValue = cryptoUtils.concatenateArrays(padding2, new BigInteger("1").toByteArray(),
+        salt.toByteArray());
+    // dbMask = MGF(H, emLen - hLen -1)
+    byte[] dbMask = cryptoUtils.generateMaskMgf1(emLength - saltLength - 1, hashPrime);
+    // MaskedDB = DB xor dbMask
+    byte[] maskedDb = cryptoUtils.xorArrays(dbMask, dbValue);
+
+    // em = maskedDB || H || 0xBC
+    return cryptoUtils.concatenateArrays(maskedDb, hashPrime, new BigInteger("188").toByteArray());
+
+  }
+
+  private boolean verify(byte[] message, byte[] sign) {
+    // mHash = Hash(m)
+    byte[] mhash = cryptoUtils.hash(message);
+    int saltLength = mhash.length;
+    int emLength = 1024 / 8;
+
+    // End if the rightmost octet of sign does not have hexadecimal value 0xBC
+    if (sign[sign.length - 1] != (byte) 0xBC) {
+      throw new InvalidParameterException("Bad sign format");
     }
 
-    BigInteger factorN = primeP.multiply(primeQ);
+    // maskedDB = the leftmost emLen − hLen − 1 octets of sign
+    int maskedDbSize = emLength - saltLength - 1;
+    byte[] maskedDb = Arrays.copyOfRange(sign, 0, maskedDbSize);
+    // H = the next hLen octets
+    byte[] tableH = Arrays.copyOfRange(sign, maskedDbSize, maskedDbSize + saltLength);
+    // dbMask = MGF(H, emLen − hLen − 1)
+    byte[] dbMask = cryptoUtils.generateMaskMgf1(maskedDbSize, tableH);
+    // DB = maskedDB xor dbMask
+    byte[] dbValue = cryptoUtils.xorArrays(dbMask, maskedDb);
 
-    // Public key is (n,e)
-    publicKey.setModulus(factorN);
-    publicKey.setExponent(primeE);
+    // End if byte at position emLen − hLen − sLen − 1 does not have hexadecimal value 0x01
+    if (dbValue[emLength - 2 * saltLength - 2] != (byte) 0x01) {
+      throw new InvalidParameterException("Bad sign format");
+    }
+    // the last sLen octets of DB
+    byte[] salt = Arrays.copyOfRange(dbValue, dbValue.length - saltLength, dbValue.length);
+    byte[] padding1 = new byte[8];
+    // m' = (0x)00 00 00 00 00 00 00 00 || mHash || salt
+    byte[] messagePrime = cryptoUtils.concatenateArrays(padding1, mhash, salt);
+    // H' = Hash(m')
+    byte[] primeH = cryptoUtils.hash(messagePrime);
 
-    // Solves d*e = 1*(mod phi)
-    BigInteger factorD = primeE.modInverse(phi);
-    // Private key is (n,d)
-    privateKey.setModulus(factorN);
-    privateKey.setExponent(factorD);
+    return Arrays.equals(primeH, tableH);
+
   }
 
-  /**
-   * Counts number of coprime numbers to p*q product in special case, when p, q are primes. In range
-   * 0 < k < p*q there are p−1 distinct multiples of q and q−1 distinct multiples of p, and a bit of
-   * thought shows that these two sets cannot overlap, as any positive number that was a multiple of
-   * both p and q would have to be at least as large as p*q. So, in 0 < k < p*q range are (p*q-1)
-   * number and (q-1) + (p -1) are not coprimes, thus phi(p*q) = (p*q-1) - (q-1) - (p-1) =
-   * (q-1)*(p-1)
-   * 
-   * @param p first prime number
-   * @param q second prime number
-   * @return number of relatively prime numbers
-   */
-  private BigInteger eulerFunction(BigInteger primeP, BigInteger primeQ) {
-    return primeP.subtract(BigInteger.ONE).multiply(primeQ.subtract(BigInteger.ONE));
+  @Override
+  public KeyPair genarateKeys(int keySize) {
+    return rsaService.generateKeys(keySize);
   }
 
-  public byte[] encrypt(byte[] message, Key key) {
-    return (new BigInteger(message)).modPow(key.getExponent(), key.getModulus()).toByteArray();
+  @Override
+  public boolean verifySign(byte[] file, byte[] sign, KeyPair keys) {
+    byte[] decodedData = rsaService.decrypt(sign, (RsaKey) keys.getPublicKey());
+    return verify(file, decodedData);
   }
 
-  public byte[] decrypt(byte[] message, Key key) {
-    return (new BigInteger(message)).modPow(key.getExponent(), key.getModulus()).toByteArray();
-  }
 
 
 }

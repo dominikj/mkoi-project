@@ -30,6 +30,7 @@
 					<ul id="nav">
 						<li class="current"><a href="/">Home</a></li>
 						<li><a href="/rsapss">RSA-PSS</a></li>
+						<li><a href="/dsa">DSA</a></li>
 					</ul>
 				</div>
 				<!--close menubar-->
