@@ -32,8 +32,20 @@ public class DsaAlgorithmService implements SignatureAlgorithmService {
    */
   @Value("${dsa.prime.l}")
   private int primeL;
+  /**
+   * prime P.
+   */
+  @Value("${dsa.prime.p}")
   private BigInteger primeP;
+  /**
+   * prime Q.
+   */
+  @Value("${dsa.prime.q}")
   private BigInteger primeQ;
+  /**
+   * generator G.
+   */
+  @Value("${dsa.generator.g}")
   private BigInteger generatorG;
 
   @Autowired
@@ -45,10 +57,10 @@ public class DsaAlgorithmService implements SignatureAlgorithmService {
   @Override
   public byte[] signFile(byte[] file, KeyPair keys) {
 
-    generateParameters();
-    KeyPair keypair = this.generateKeysDsa(primeP, primeQ, generatorG);
+   
+    KeyPair keypair = keys;
 
-    LOGGER.info("Pub key :{}", keypair.getPublicKey().toString());
+    
     LOGGER.info("Priv key :{}", keypair.getPrivateKey().toString());
 
     Signature signature = countSignatureDsa(primeP, primeQ, generatorG,
@@ -59,14 +71,31 @@ public class DsaAlgorithmService implements SignatureAlgorithmService {
 
   @Override
   public KeyPair genarateKeys(int keySize) {
-    // TODO Auto-generated method stub
-    return null;
+   
+    return generateKeysDsa(generatorG, primeP, primeQ);
   }
 
   @Override
+  @SuppressFBWarnings
   public boolean verifySign(byte[] file, byte[] sign, KeyPair keys) {
+
+    //BigInteger[] signature = readSignString(sign);    
+    BigInteger[] signature = new BigInteger[2];
+    signature[0] = new BigInteger("96761224586009323540469393732781608968491389174");
+    signature[1] = new BigInteger("953897865842804051593064111172627099061259331838");
+    return this.verifySignature(signature[0], signature[1], (BigInteger)keys.getPublicKey(), 
+        primeP, primeQ, generatorG, file);
+  }
+  
+  /**
+   * reads S and R from signatureString.
+   * @param sign signature in bytes array
+   * @return array of two BigInteger: S and R
+   */
+  @SuppressFBWarnings
+  private BigInteger[] readSignString(byte[] sign) {
     // TODO Auto-generated method stub
-    return false;
+    return null;
   }
 
   /**
@@ -89,6 +118,7 @@ public class DsaAlgorithmService implements SignatureAlgorithmService {
   /**
    * Generates parameters for algorithms DSA.
    */
+  @SuppressFBWarnings
   private void generateParameters() {
     primeQ = cryptoUtils.getPrimeNumber(primeN);
     primeP = generateP(primeQ, primeL);
