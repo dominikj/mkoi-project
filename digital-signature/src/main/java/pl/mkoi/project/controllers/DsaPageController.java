@@ -53,11 +53,11 @@ public class DsaPageController extends PageController {
   @ResponseBody
   public HttpEntity<byte[]> signFile(@RequestParam("file") MultipartFile file,
       @RequestParam("key") MultipartFile key) {
-    
+
 
     LOGGER.info("Rozpoczęto podpisywanie pliku: {} kluczem: {}", file.getOriginalFilename(),
         key.getOriginalFilename());
-       
+
     try {
       KeyPair keyPair = readPrivateKey(key.getBytes());
       byte[] fileSignature;
@@ -65,38 +65,40 @@ public class DsaPageController extends PageController {
       String filename = "sign_".concat(file.getOriginalFilename()).concat(".txt");
       return new HttpEntity<byte[]>(fileSignature,
           prepareHeaders(fileSignature.length, filename, MediaType.TEXT_PLAIN));
-    
+
     } catch (IOException e) {
       LOGGER.error("Błąd wczytywania plików");
       return null;
     }
-   
+
 
   }
 
   /**
    * makes KeyPair with publicKey (privateKey is null) from byte[].
+   * 
    * @param bytes bytes with publicKey
    * @return KeyPair with only publicKey
    */
   @SuppressFBWarnings
   private KeyPair readPublicKey(byte[] bytes) {
 
-    String publicKey = "343434";
+    String publicKey = new String(bytes, Charset.defaultCharset());
     return new DsaKeyPair(null, new BigInteger(publicKey));
-    
+
   }
-  
+
   /**
    * makes KeyPair with privateKey (publicKey is null) from byte[].
+   * 
    * @param bytes bytes with privateKey
    * @return KeyPair with only privateKey
    */
   private KeyPair readPrivateKey(byte[] bytes) {
 
-    String privateKey = "262383617370454394093973339563508732920227898935";
+    String privateKey = new String(bytes, Charset.defaultCharset());
     return new DsaKeyPair(new BigInteger(privateKey), null);
-    
+
   }
 
   /**
@@ -110,14 +112,14 @@ public class DsaPageController extends PageController {
 
     KeyPair keys = signService.genarateKeys(1024);
     ZipBuilder builder = getZipBuilder();
-    
+
     builder.addFile("private_key.txt",
         keys.getPrivateKey().toString().getBytes(Charset.defaultCharset()));
 
     builder.addFile("public_key.txt",
         keys.getPublicKey().toString().getBytes(Charset.defaultCharset()));
 
- 
+
     String filename = "Keys_".concat(LocalDateTime.now().toString().concat(".zip"));
 
     byte[] zipFile = builder.build();

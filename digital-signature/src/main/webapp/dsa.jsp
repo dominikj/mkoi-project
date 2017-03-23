@@ -131,20 +131,30 @@ function openCity(evt, cityName) {
 
 			<div id="content">
 				<div class="content_item">
-					<h1>Lorem ipsum dolor sit amet</h1>
-					<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-						Proin nibh augue, suscipit a, scelerisque sed, lacinia in, mi.
-						Cras vel lorem. Etiam pellentesque aliquet tellus. Phasellus
-						pharetra nulla ac diam. Quisque semper justo at risus. Donec
-						venenatis, turpis vel hendrerit interdum, dui ligula ultricies
-						purus, sed posuere libero dui id orci. Nam congue, pede vitae
-						dapibus aliquet, elit magna vulputate arcu, vel tempus metus leo
-						non est. Etiam sit amet lectus quis est congue mollis. Phasellus
-						congue lacus eget neque. Phasellus ornare, ante vitae consectetuer
-						consequat, purus sapien ultricies dolor, et mollis pede metus eget
-						nisi. Praesent sodales velit quis augue. Cras suscipit, urna at
-						aliquam rhoncus, urna quam viverra nisi, in interdum massa nibh
-						nec erat.</p>
+					<h1>Algorytm DSA</h1>
+					<p>
+						<b>Digital Signature Algorithm</b> to asymetryczny algorytm stworzony 
+						przez National Institute of Standards and Technology w 1991 roku dla 
+						potrzeb Digital Signature Standard. 
+					</p>
+					<p>
+						Do wygenerowania kluczy oraz samego podpisu potrzebne są trzy parametry,
+						które mogą być dzielone przez wszystkich użytkowników systemu. Są to: liczba
+						pierwsza P, liczba pierwsza Q oraz generator G. Następnie każdy z użytkowników
+						może wygenerować na podstawie tych trzech stałych swój indywidulany zestaw kluczy - 
+						klucz prywatny wykorzystywany do podpisywania dokumentu oraz klucz publiczny potrzebny
+						przy weryfikacji podpisu.
+					</p>
+					<p>
+						Podpis w algorytmie DSA składa się z dwóch elementów - S i R. Dodatkowo do weryfikacji 
+						podpisu niezbędne są parametry początkowe - P, Q i G oraz klucz publiczny podpisującego 
+						dokument.
+					</p>	
+					<p>
+						Przy podpisywaniu dokumentu każdorazowo losowana jest pewna wartość k. Jej unikatowość
+						i pełna przypadkowość jest krytyczna dla bezpieczeństwa całego algorytmu, dlatego istotna
+						jest jakość generatora liczb losowych.
+					</p>
 
 
 					<div class="tab">
@@ -168,7 +178,7 @@ function openCity(evt, cityName) {
 									<td><input type="button" value="Wybierz plik"
 										onclick="$('#file').click(); " /></td>
 									<td><input type="button" class="button_small"
-										value="Wybierz klucz" onclick="$('#key').click(); " /></td>
+										value="Wybierz klucz prywatny" onclick="$('#key').click(); " /></td>
 									<td><input class="button_small" id="submit" type="submit"
 										value="Generuj podpis" disabled="true" /></td>
 								</tr>
