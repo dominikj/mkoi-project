@@ -9,6 +9,7 @@ import pl.mkoi.project.keys.KeyPair;
 import pl.mkoi.project.keys.RsaKey;
 import pl.mkoi.project.services.SignatureAlgorithmService;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.InvalidParameterException;
 import java.security.SecureRandom;
@@ -21,6 +22,7 @@ public class RsapssAlgorithmService implements SignatureAlgorithmService {
   private final RsaCryptoService rsaService;
   private final CryptoFacade cryptoUtils;
   private static final Logger LOGGER = LoggerFactory.getLogger(RsapssAlgorithmService.class);
+  private static final int SIGN_SIZE = 1024 / 8;
 
   @Autowired
   public RsapssAlgorithmService(RsaCryptoService rsaService, CryptoFacade cryptoUtils) {
@@ -31,7 +33,6 @@ public class RsapssAlgorithmService implements SignatureAlgorithmService {
   @Override
   public byte[] signFile(byte[] file, KeyPair keys) {
     byte[] sign = encode(file);
-    
     return rsaService.encrypt(sign, (RsaKey) keys.getPrivateKey());
   }
 
@@ -43,9 +44,12 @@ public class RsapssAlgorithmService implements SignatureAlgorithmService {
     // function Hash) and 0"
     int saltLength = mhash.length;
 
-    int emLength = 1024 / 8;
+    int emLength = SIGN_SIZE;
 
     BigInteger salt = new BigInteger(saltLength * 8, new SecureRandom());
+    while (salt.toByteArray().length != saltLength) {
+      salt = new BigInteger(saltLength * 8, new SecureRandom());
+    }
 
     // zero-byte series is used as a padding
     byte[] padding1 = new byte[8];
@@ -53,7 +57,6 @@ public class RsapssAlgorithmService implements SignatureAlgorithmService {
     byte[] messagePrime = cryptoUtils.concatenateArrays(padding1, mhash, salt.toByteArray());
     // H = Hash(m')
     byte[] hashPrime = cryptoUtils.hash(messagePrime);
-
     // PS
     byte[] padding2 = new byte[emLength - 2 * saltLength - 2];
     // DB = PS || 0x01 || salt
@@ -73,7 +76,7 @@ public class RsapssAlgorithmService implements SignatureAlgorithmService {
     // mHash = Hash(m)
     byte[] mhash = cryptoUtils.hash(message);
     int saltLength = mhash.length;
-    int emLength = 1024 / 8;
+    int emLength = SIGN_SIZE;
 
     // End if the rightmost octet of sign does not have hexadecimal value 0xBC
     if (sign[sign.length - 1] != (byte) 0xBC) {
@@ -112,11 +115,10 @@ public class RsapssAlgorithmService implements SignatureAlgorithmService {
   }
 
   @Override
-  public boolean verifySign(byte[] file, byte[] sign, KeyPair keys) {
+  public boolean verifySign(byte[] file, byte[] sign, KeyPair keys)
+      throws ClassNotFoundException, IOException {
     byte[] decodedData = rsaService.decrypt(sign, (RsaKey) keys.getPublicKey());
     return verify(file, decodedData);
   }
-
-
 
 }

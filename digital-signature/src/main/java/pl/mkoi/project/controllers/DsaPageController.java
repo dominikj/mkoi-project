@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,6 +18,7 @@ import org.springframework.web.servlet.ModelAndView;
 import pl.mkoi.project.builders.ZipBuilder;
 import pl.mkoi.project.keys.DsaKeyPair;
 import pl.mkoi.project.keys.KeyPair;
+import pl.mkoi.project.keys.RsaKeyPair;
 import pl.mkoi.project.services.SignatureAlgorithmService;
 import pl.mkoi.project.services.impl.DsaAlgorithmService;
 
@@ -39,8 +41,9 @@ public class DsaPageController extends PageController {
   }
 
   @RequestMapping(value = "", method = RequestMethod.GET)
-  public ModelAndView showRsapssPage() {
-    return new ModelAndView("dsa");
+  public String showRsapssPage(Model model) {
+    model.addAttribute("baseUrl", "/dsa");
+    return "dsa";
   }
 
   /**
@@ -128,4 +131,27 @@ public class DsaPageController extends PageController {
         prepareHeaders(zipFile.length, filename, MediaType.MULTIPART_FORM_DATA));
 
   }
+
+  /**
+   * Verify sign.
+   * 
+   * @param file file
+   * @param key key
+   * @param sign sign
+   * @param model model
+   * @return view
+   */
+  @RequestMapping(value = "/verify-sign", method = RequestMethod.POST)
+  public String verifySign(@RequestParam("file") MultipartFile file,
+      @RequestParam("key") MultipartFile key, @RequestParam("sign") MultipartFile sign,
+      Model model) {
+    
+    //TODO
+    //Mocked
+    model.addAttribute("signVerified", true);
+
+    model.addAttribute("baseUrl", "/dsa");
+    return "dsa";
+  }
+
 }

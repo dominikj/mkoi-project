@@ -1,6 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
 <html>
 
@@ -9,56 +8,9 @@
 <meta name="description" content="website description" />
 <meta name="keywords" content="website keywords, website keywords" />
 <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-<link rel="stylesheet" type="text/css" href="css/style.css" />
+<link rel="stylesheet" type="text/css" href=<spring:url value="/css/style.css" /> />
 <!-- modernizr enables HTML5 elements and feature detects -->
-<script type="text/javascript" src="js/modernizr-1.5.min.js"></script>
-<script type="text/javascript">
-
-function enableGenerateKey(){
-if( ($("#file").val() != null && $("#file").val() != "")&& ($("#key").val() != null && $("#key").val() != "")){
-$("#submit").attr("disabled",false);
-}
-else{
-$("#submit").attr("disabled",true);
-}
-}
-
-function showLoadedFile(file){
-var pieces = file.value.split('\\'); 
-var filename = pieces[pieces.length-1]; 
-$("#file_info b").html(filename); 
-enableGenerateKey();
-}
-
-function showLoadedKey(file){
-var pieces = file.value.split('\\'); 
-var filename = pieces[pieces.length-1]; 
-$("#key_info b").html(filename); 
- enableGenerateKey();
-}
-
-function openCity(evt, cityName) {
-    // Declare all variables
-    var i, tabcontent, tablinks;
-
-    // Get all elements with class="tabcontent" and hide them
-    tabcontent = document.getElementsByClassName("tabcontent");
-    for (i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].style.display = "none";
-    }
-
-    // Get all elements with class="tablinks" and remove the class "active"
-    tablinks = document.getElementsByClassName("tablinks");
-    for (i = 0; i < tablinks.length; i++) {
-        tablinks[i].className = tablinks[i].className.replace(" active", "");
-    }
-
-    // Show the current tab, and add an "active" class to the button that opened the tab
-    document.getElementById(cityName).style.display = "block";
-    evt.currentTarget.className += " active";
-}
-</script>
-
+<script type="text/javascript" src="/js/modernizr-1.5.min.js"></script>
 </head>
 
 <body>
@@ -90,9 +42,9 @@ function openCity(evt, cityName) {
 			<div class="slideshow">
 				<ul class="slideshow">
 					<li class="show"><img width="940" height="250"
-						src="images/home_1.jpg"
+						src="/images/home_1.jpg"
 						alt="Podpis cyfrowy jest ważną składową współczesnego cyberbezpieczeństwa" /></li>
-					<li><img width="940" height="250" src="images/home_2.jpg"
+					<li><img width="940" height="250" src="/images/home_2.jpg"
 						alt="Współczesny człowiek styka się  z cyberbezpieczeństwem w codziennym życiu" /></li>
 				</ul>
 			</div>
@@ -152,56 +104,7 @@ function openCity(evt, cityName) {
 						Jeśli obie wartości się zgadzają, to przyjmuje się, że wiadomość
 						została podpisana poprawnie.</p>
 
-					<div class="tab">
-						<button class="tablinks" onclick="openCity(event, 'Sign')">Podpis</button>
-						<button class="tablinks" onclick="openCity(event, 'Keys')">Klucze</button>
-						<button class="tablinks" onclick="openCity(event, 'Verify')">Weryfikacja</button>
-					</div>
-
-					<div id="Sign" class="tabcontent">
-						<h3>Generacja podpisu pliku</h3>
-						<form:form method="POST" enctype="multipart/form-data"
-							action="/rsapss/sign-file">
-							<table>
-								<tr>
-									<td><input type="file" name="file" id="file"
-										onchange="showLoadedFile(this);" style="display: none;" /></td>
-									<td><input type="file" name="key" id="key"
-										onchange="showLoadedKey(this);" style="display: none;" /></td>
-								</tr>
-								<tr>
-									<td><input type="button" value="Wybierz plik"
-										onclick="$('#file').click(); " /></td>
-									<td><input type="button" class="button_small"
-										value="Wybierz klucz" onclick="$('#key').click(); " /></td>
-									<td><input class="button_small" id="submit" type="submit"
-										value="Generuj podpis" disabled="true" /></td>
-								</tr>
-							</table>
-						</form:form>
-						<p id="file_info">
-							Wybrano plik:<b> nie wybrano pliku</b>
-						</p>
-						<p id="key_info">
-							Wybrano klucz:<b> nie wybrano klucza</b>
-						</p>
-					</div>
-
-					<div id="Keys" class="tabcontent">
-
-						<h3>Generacja pary kluczy</h3>
-						Wygeneruj nową parę kluczy
-						<form:form method="GET" action="/rsapss/generate-keys">
-							<p>
-								<input type="submit" value="Generuj" />
-							</p>
-						</form:form>
-					</div>
-
-					<div id="Verify" class="tabcontent">
-						<h3>Weryfikacja podpisu</h3>
-						<p>------</p>
-					</div>
+				<jsp:include page="tabsComponent.jsp" />
 				</div>
 				<!--close content_item-->
 			</div>
@@ -221,8 +124,8 @@ function openCity(evt, cityName) {
 	</footer>
 
 	<!-- javascript at the bottom for fast page loading -->
-	<script type="text/javascript" src="js/jquery.min.js"></script>
-	<script type="text/javascript" src="js/image_slide.js"></script>
+	<script type="text/javascript" src="/js/jquery.min.js"></script>
+	<script type="text/javascript" src="/js/image_slide.js"></script>
 
 </body>
 </html>

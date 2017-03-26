@@ -4,11 +4,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -76,14 +84,14 @@ public class CryptoFacade {
     int counter = 0;
 
     while (mask.size() < length) {
-      //Prepare and hash a new chunk of data: H(message || C)
+      // Prepare and hash a new chunk of data: H(message || C)
       byte[] concatenatedData = new byte[message.length + 4];
       System.arraycopy(message, 0, concatenatedData, 0, message.length);
       System.arraycopy(i2osp(counter), 0, concatenatedData, message.length - 5, 4);
 
       byte[] hashedData = hash(concatenatedData);
 
-      //Transform hashed data to list collection and append to mask
+      // Transform hashed data to list collection and append to mask
       mask.addAll(Stream.of(hashedData).flatMap(d -> {
         List<Byte> tmpList = new ArrayList<>();
         for (byte b : d) {
@@ -94,8 +102,8 @@ public class CryptoFacade {
           .collect(Collectors.toList()));
       ++counter;
     }
-    
-    //transform mask from list to byte array
+
+    // transform mask from list to byte array
     byte[] finalMask = new byte[length];
     for (int i = 0; i < length; ++i) {
       finalMask[i] = mask.get(i).byteValue();
@@ -112,7 +120,7 @@ public class CryptoFacade {
     stringTable[3] = (byte) (integer >>> 0);
     return stringTable;
   }
-  
+
   /**
    * Concatenates two or three arrays.
    * 
@@ -156,5 +164,38 @@ public class CryptoFacade {
     return xoredArray;
   }
 
+  /**
+   * Serializes and encodes data to Base64 code.
+   * 
+   * @param data data to coding
+   * @return coded data
+   */
+  public <T> byte[] serializeAndCodeByte64(T data) {
+    try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutput out = new ObjectOutputStream(bos)) {
+      out.writeObject(data);
+      out.flush();
+      return Base64.getEncoder().encode(bos.toByteArray());
+    } catch (IOException e) {
+      return new byte[0];
+    }
+  }
+
+  /**
+   * Decodes data from Base64 code and deserialize object.
+   * 
+   * @param data to decoding
+   * @return deserialized object
+   * @throws IOException error during open stream
+   * @throws ClassNotFoundException error during deserialization
+   */
+  @SuppressWarnings("unchecked")
+  public <T> T decodeBase64AndDeserialize(byte[] data) throws IOException, ClassNotFoundException {
+    byte[] decodedData = Base64.getDecoder().decode(data);
+    try (ByteArrayInputStream bis = new ByteArrayInputStream(decodedData);
+        ObjectInput in = new ObjectInputStream(bis)) {
+      return (T) in.readObject();
+    }
+  }
 
 }

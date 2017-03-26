@@ -7,7 +7,12 @@ import pl.mkoi.project.facades.CryptoFacade;
 import pl.mkoi.project.keys.RsaKey;
 import pl.mkoi.project.keys.RsaKeyPair;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 @Component
@@ -15,6 +20,7 @@ public class RsaCryptoService {
 
   private final CryptoFacade cryptoUtils;
   private static final String MIN_EXPONENT = "65537";
+  private static final int MAX_DATA_CHUNK_SIZE = 127;
 
   @Autowired
   public RsaCryptoService(CryptoFacade cryptoUtils) {
@@ -80,13 +86,84 @@ public class RsaCryptoService {
     return primeP.subtract(BigInteger.ONE).multiply(primeQ.subtract(BigInteger.ONE));
   }
 
+  /**
+   * Encrypts data.
+   * 
+   * @param message data to encrypt
+   * @param key key for encrypt
+   * @return encrypted data as serialized object
+   */
   public byte[] encrypt(byte[] message, RsaKey key) {
-    return (new BigInteger(message)).modPow(key.getExponent(), key.getModulus()).toByteArray();
+    // data splitted on chunks smaller than modulus
+    List<byte[]> preparedData = prepareData(message, MAX_DATA_CHUNK_SIZE);
+    List<byte[]> encryptedData = new ArrayList<>();
+
+    for (byte[] b : preparedData) {
+      encryptedData
+          .add((new BigInteger(b)).modPow(key.getExponent(), key.getModulus()).toByteArray());
+    }
+    return cryptoUtils.serializeAndCodeByte64(encryptedData);
   }
 
-  public byte[] decrypt(byte[] message, RsaKey key) {
-    return (new BigInteger(message)).modPow(key.getExponent(), key.getModulus()).toByteArray();
+  /**
+   * Decrypts data.
+   * 
+   * @param message encrypted data
+   * @param key key
+   * @return decrypted data
+   * @throws IOException exception during access to {@link ByteArrayOutputStream}
+   * @throws ClassNotFoundException exception during deserialization object
+   */
+  public byte[] decrypt(byte[] message, RsaKey key) throws IOException, ClassNotFoundException {
+    ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
+
+    // makes data to byte arrays list
+    List<byte[]> data = cryptoUtils.decodeBase64AndDeserialize(message);
+
+    data.stream().forEach(b -> {
+      byte[] decodedChunk =
+          (new BigInteger(1, b)).modPow(key.getExponent(), key.getModulus()).toByteArray();
+      try {
+        byteOutput.write(decodedChunk);
+      } catch (IOException e) {
+        throw new RuntimeException();
+      }
+    });
+    byte[] decodedData = byteOutput.toByteArray();
+    // remove additional zero at start of decoded block
+    if (decodedData[0] == 0) {
+      decodedData = Arrays.copyOfRange(decodedData, 1, decodedData.length);
+    }
+    return decodedData;
   }
 
+  private List<byte[]> prepareData(byte[] data, int blockSize) {
+
+    int blockCount = (data.length + blockSize - 1) / blockSize;
+    List<byte[]> preparedData = new ArrayList<byte[]>();
+    // Gets blocks of data with size blockSize, concatenates with zero byte at the start, and adds
+    // to list
+    for (int i = 1; i < blockCount; i++) {
+      int idx = (i - 1) * blockSize;
+      byte[] tmpArr = new byte[blockSize + 1];
+      System.arraycopy(data, idx, tmpArr, 1, blockSize);
+      preparedData.add(tmpArr);
+    }
+
+    // Last chunk
+    int end = -1;
+    if (data.length % blockSize == 0) {
+      end = data.length;
+    } else {
+      end = data.length % blockSize + blockSize * (blockCount - 1);
+    }
+
+    byte[] tempArr = Arrays.copyOfRange(data, (blockCount - 1) * blockSize, end);
+    byte[] addZeroArr = new byte[tempArr.length + 1];
+
+    System.arraycopy(tempArr, 0, addZeroArr, 1, tempArr.length);
+    preparedData.add(addZeroArr);
+    return preparedData;
+  }
 
 }
