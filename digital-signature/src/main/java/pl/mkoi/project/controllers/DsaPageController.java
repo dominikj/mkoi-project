@@ -140,15 +140,18 @@ public class DsaPageController extends PageController {
    * @param sign sign
    * @param model model
    * @return view
+   * @throws IOException exception during access file data
+   * @throws ClassNotFoundException exception during serialize data
    */
   @RequestMapping(value = "/verify-sign", method = RequestMethod.POST)
   public String verifySign(@RequestParam("file") MultipartFile file,
       @RequestParam("key") MultipartFile key, @RequestParam("sign") MultipartFile sign,
-      Model model) {
+      Model model) throws IOException, ClassNotFoundException {
     
-    //TODO
-    //Mocked
-    model.addAttribute("signVerified", true);
+    KeyPair keypair = readPublicKey(key.getBytes());
+    
+    model.addAttribute("signVerified", signService.verifySign(file.getBytes(), sign.getBytes(), 
+        keypair));
 
     model.addAttribute("baseUrl", "/dsa");
     return "dsa";

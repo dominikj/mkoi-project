@@ -94,7 +94,7 @@ public class DsaAlgorithmService implements SignatureAlgorithmService {
   private BigInteger[] readSignString(byte[] sign) {
     String signature = new String(sign, Charset.defaultCharset());
     String[] sandr = signature.split("NumberS");
-    sandr = (sandr[0]).split("NumberR");
+    sandr = (sandr[1]).split("NumberR");
     BigInteger[] sandrB = new BigInteger[2];
     sandrB[0] = new BigInteger(sandr[0]);
     sandrB[1] = new BigInteger(sandr[1]);
