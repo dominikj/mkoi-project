@@ -19,22 +19,22 @@ public class EcdsaAlgorithmService implements SignatureAlgorithmService {
 
   private final CryptoFacade cryptoUtils;
 
-  @Value("{ecdsa.modulus.p}")
+  @Value("${ecdsa.modulus.p}")
   BigInteger modulusP;
 
-  @Value("{ecdsa.primeOrder.n}")
+  @Value("${ecdsa.primeOrder.n}")
   BigInteger primeOrderN;
 
-  @Value("{ecdsa.coefficient.a}")
+  @Value("${ecdsa.coefficient.a}")
   BigInteger coefficientA;
 
-  @Value("{ecdsa.coefficient.b}")
+  @Value("${ecdsa.coefficient.b}")
   BigInteger coefficientB;
 
-  @Value("{ecdsa.curveGeneratorPoint.g.x}")
+  @Value("${ecdsa.curveGeneratorPoint.g.x}")
   BigInteger generatorPointx;
 
-  @Value("{ecdsa.curveGeneratorPoint.g.y}")
+  @Value("${ecdsa.curveGeneratorPoint.g.y}")
   BigInteger generatorPointy;
 
 
