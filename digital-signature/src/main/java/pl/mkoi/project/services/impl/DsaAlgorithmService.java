@@ -12,6 +12,7 @@ import pl.mkoi.project.keys.DsaKeyPair;
 import pl.mkoi.project.keys.KeyPair;
 import pl.mkoi.project.services.SignatureAlgorithmService;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.security.SecureRandom;
@@ -66,7 +67,7 @@ public class DsaAlgorithmService implements SignatureAlgorithmService {
     Signature signature = countSignatureDsa(primeP, primeQ, generatorG,
         (BigInteger) keypair.getPrivateKey(), hash(file));
 
-    return signature.toString().getBytes(Charset.defaultCharset());
+    return cryptoUtils.serializeAndCodeByte64(signature.toString());
   }
 
   @Override
@@ -76,8 +77,8 @@ public class DsaAlgorithmService implements SignatureAlgorithmService {
   }
 
   @Override
-  @SuppressFBWarnings
-  public boolean verifySign(byte[] file, byte[] sign, KeyPair keys) {
+  public boolean verifySign(byte[] file, byte[] sign, KeyPair keys)
+      throws ClassNotFoundException, IOException {
 
     BigInteger[] signature = readSignString(sign);
     return this.verifySignature(signature[0], signature[1], (BigInteger) keys.getPublicKey(),
@@ -89,10 +90,11 @@ public class DsaAlgorithmService implements SignatureAlgorithmService {
    * 
    * @param sign signature in bytes array
    * @return array of two BigInteger: S and R
+   * @throws IOException error during open stream
+   * @throws ClassNotFoundException error during deserialization
    */
-  @SuppressFBWarnings
-  private BigInteger[] readSignString(byte[] sign) {
-    String signature = new String(sign, Charset.defaultCharset());
+  private BigInteger[] readSignString(byte[] sign) throws ClassNotFoundException, IOException {
+    String signature = cryptoUtils.decodeBase64AndDeserialize(sign);
     String[] sandr = signature.split("NumberS");
     sandr = (sandr[1]).split("NumberR");
     BigInteger[] sandrB = new BigInteger[2];
@@ -116,58 +118,6 @@ public class DsaAlgorithmService implements SignatureAlgorithmService {
 
     return new DsaKeyPair(privateX, publicY);
 
-  }
-
-  /**
-   * Generates parameters for algorithms DSA.
-   */
-  @SuppressFBWarnings
-  private void generateParameters() {
-    primeQ = cryptoUtils.getPrimeNumber(primeN);
-    primeP = generateP(primeQ, primeL);
-    generatorG = this.generateG(primeP, primeQ);
-  }
-
-  /**
-   * Generates primeP that (primeP-1)%primeQ = 0.
-   * 
-   * @param primeQ primeQ
-   * @param primeL length of primeP (in number of bits)
-   * @return primeP
-   */
-  private BigInteger generateP(BigInteger primeQ, int length) {
-
-    SecureRandom rand = new SecureRandom();
-    BigInteger p1;
-    BigInteger p2;
-    do {
-      p1 = BigInteger.probablePrime(length, rand);
-      p2 = p1.subtract(BigInteger.ONE);
-      p1 = p1.subtract(p2.remainder(primeQ));
-    } while (!p1.isProbablePrime(20));
-    return p1;
-  }
-
-  /**
-   * Generates a generator G which is needed in the DSA algorithm.
-   * 
-   * @param p first prime number
-   * @param q second prime number
-   * @return generator G
-   */
-  private BigInteger generateG(BigInteger numberP, BigInteger numberQ) {
-    BigInteger numberE = (numberP.subtract(BigInteger.ONE)).divide(numberQ);
-    BigInteger numberG = BigInteger.ONE;
-    SecureRandom rand = new SecureRandom();
-    while (numberG.equals(BigInteger.ONE)) {
-      BigInteger numberH = new BigInteger(numberP.subtract(BigInteger.ONE).bitLength(), rand);
-      numberG = numberH.modPow(numberE, numberP);
-
-      if (numberH.compareTo(numberP) >= 0) {
-        numberG = BigInteger.ONE;
-      }
-    }
-    return numberG;
   }
 
   /**
@@ -219,7 +169,6 @@ public class DsaAlgorithmService implements SignatureAlgorithmService {
    * @param file file
    * @return verification
    */
-  @SuppressFBWarnings
   private boolean verifySignature(BigInteger signatureS, BigInteger signatureR,
       BigInteger publicKey, BigInteger primeP, BigInteger primeQ, BigInteger generatorG,
       byte[] file) {

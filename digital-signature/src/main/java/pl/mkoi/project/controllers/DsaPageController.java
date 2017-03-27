@@ -83,7 +83,6 @@ public class DsaPageController extends PageController {
    * @param bytes bytes with publicKey
    * @return KeyPair with only publicKey
    */
-  @SuppressFBWarnings
   private KeyPair readPublicKey(byte[] bytes) {
 
     String publicKey = new String(bytes, Charset.defaultCharset());
@@ -145,13 +144,13 @@ public class DsaPageController extends PageController {
    */
   @RequestMapping(value = "/verify-sign", method = RequestMethod.POST)
   public String verifySign(@RequestParam("file") MultipartFile file,
-      @RequestParam("key") MultipartFile key, @RequestParam("sign") MultipartFile sign,
-      Model model) throws IOException, ClassNotFoundException {
-    
+      @RequestParam("key") MultipartFile key, @RequestParam("sign") MultipartFile sign, Model model)
+          throws IOException, ClassNotFoundException {
+
     KeyPair keypair = readPublicKey(key.getBytes());
-    
-    model.addAttribute("signVerified", signService.verifySign(file.getBytes(), sign.getBytes(), 
-        keypair));
+
+    model.addAttribute("signVerified",
+        signService.verifySign(file.getBytes(), sign.getBytes(), keypair));
 
     model.addAttribute("baseUrl", "/dsa");
     return "dsa";
