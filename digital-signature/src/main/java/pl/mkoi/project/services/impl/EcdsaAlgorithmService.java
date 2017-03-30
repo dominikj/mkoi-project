@@ -6,13 +6,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 import pl.mkoi.project.facades.CryptoFacade;
+import pl.mkoi.project.keys.EcdsaKeyPair;
 import pl.mkoi.project.keys.KeyPair;
 import pl.mkoi.project.points.Point;
 import pl.mkoi.project.services.SignatureAlgorithmService;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.security.SecureRandom;
 
+@SuppressFBWarnings
 @Component("EcdsaAlgorithmService")
 @PropertySource("configuration-default.properties")
 public class EcdsaAlgorithmService implements SignatureAlgorithmService {
@@ -20,27 +24,36 @@ public class EcdsaAlgorithmService implements SignatureAlgorithmService {
   private final CryptoFacade cryptoUtils;
 
   @Value("${ecdsa.modulus.p}")
-  BigInteger modulusP;
+  private BigInteger modulusP;
 
   @Value("${ecdsa.primeOrder.n}")
-  BigInteger primeOrderN;
+  private BigInteger primeOrderN;
 
   @Value("${ecdsa.coefficient.a}")
-  BigInteger coefficientA;
+  private  BigDecimal coefficientA;
 
-  @Value("${ecdsa.coefficient.b}")
-  BigInteger coefficientB;
+  private final BigInteger coefficientB;
 
-  @Value("${ecdsa.curveGeneratorPoint.g.x}")
-  BigInteger generatorPointx;
+  private final Point generatorPoint;
 
-  @Value("${ecdsa.curveGeneratorPoint.g.y}")
-  BigInteger generatorPointy;
-
-
+  /**
+   * Default constructor.
+   * 
+   * @param cryptoUtils autowired bean
+   */
   @Autowired
-  public EcdsaAlgorithmService(final CryptoFacade cryptoUtils) {
+  public EcdsaAlgorithmService(final CryptoFacade cryptoUtils,
+      @Value("${ecdsa.curveGeneratorPoint.g.x}") final String generatorPointx,
+      @Value("${ecdsa.curveGeneratorPoint.g.y}") final String generatorPointy,
+      @Value("${ecdsa.coefficient.b}") final String coefficientB) {
     this.cryptoUtils = cryptoUtils;
+
+    this.generatorPoint = new Point();
+    this.generatorPoint.setX(new BigDecimal(new BigInteger(generatorPointx, 16)));
+    this.generatorPoint.setY(new BigDecimal(new BigInteger(generatorPointy, 16)));
+    this.coefficientB = new BigInteger(coefficientB, 16);
+
+
   }
 
   @Override
@@ -51,8 +64,17 @@ public class EcdsaAlgorithmService implements SignatureAlgorithmService {
 
   @Override
   public KeyPair genarateKeys(int keySize) {
-    // TODO Auto-generated method stub
-    return null;
+    // private key da
+    BigInteger scalarDa = new BigInteger(primeOrderN.bitLength(), new SecureRandom());
+    // public key Q = da*G
+    Point vectorQ = new Point(generatorPoint);
+    vectorQ.multiplyByScalar(scalarDa, coefficientA);
+
+    EcdsaKeyPair keyPair = new EcdsaKeyPair();
+    keyPair.setPrivateKey(scalarDa);
+    keyPair.setPublicKey(vectorQ);
+
+    return keyPair;
   }
 
   @Override
@@ -61,26 +83,4 @@ public class EcdsaAlgorithmService implements SignatureAlgorithmService {
     // TODO Auto-generated method stub
     return false;
   }
-
-  // R = P + P
-  @SuppressFBWarnings
-  private Point doublePoint(Point point) {
-    // s = (3*px^2 + a)/2*py
-    BigInteger factorS = point.getX().pow(2).multiply(new BigInteger("3")).add(coefficientA);
-    factorS = factorS.divide(point.getY().multiply(new BigInteger("2")));
-
-    // rx = s^2 - 2*px
-    BigInteger coordinateX = factorS.pow(2).subtract(point.getX().multiply(new BigInteger("2")));
-
-    // ry = s*(px-rx)-py
-    BigInteger coordinateY =
-        point.getX().subtract(coordinateX).multiply(factorS).subtract(point.getY());
-
-    Point doubledPoint = new Point();
-    doubledPoint.setX(coordinateX);
-    doubledPoint.setY(coordinateY);
-
-    return doubledPoint;
-  }
-
 }

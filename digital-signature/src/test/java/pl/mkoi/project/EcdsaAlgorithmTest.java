@@ -1,0 +1,52 @@
+package pl.mkoi.project;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.test.util.ReflectionTestUtils;
+import pl.mkoi.project.facades.CryptoFacade;
+import pl.mkoi.project.keys.KeyPair;
+import pl.mkoi.project.points.Point;
+import pl.mkoi.project.services.impl.EcdsaAlgorithmService;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+
+@RunWith(MockitoJUnitRunner.class)
+public class EcdsaAlgorithmTest {
+  @Spy
+  private CryptoFacade cryptoUtils = new CryptoFacade();
+
+  private String generatorPointx =
+      "aa87ca22be8b05378eb1c71ef320ad746e1d3b628ba79b9859f741e082542a385502f25dbf55296c3a545e3872760ab7";
+
+  private String generatorPointy =
+      "3617de4a96262c6f5d9e98bf9292dc29f8f41dbd289a147ce9da3113b5f0b8c00a60b1ce1d7e819d7a431d7c90ea0e5f";
+
+  private String coefficientB =
+      "b3312fa7e23ee7e4988e056be3f82d19181d9c6efe8141120314088f5013875ac656398d8a2ed19d2a85c8edd3ec2aef";
+  
+  @InjectMocks
+  private EcdsaAlgorithmService ecdsaAlgorithmService =
+      new EcdsaAlgorithmService(cryptoUtils, generatorPointx, generatorPointy, coefficientB);
+
+  @Before
+  public void init() {
+    ReflectionTestUtils.setField(ecdsaAlgorithmService, "primeOrderN", new BigInteger(
+        "39402006196394479212279040100143613805079739270465446667948293404245721771496870329047266088258938001861606973112319"));
+    ReflectionTestUtils.setField(ecdsaAlgorithmService, "coefficientA", new BigDecimal("-3"));
+  }
+
+  @Test
+  public void testGenerateKeys() {
+    KeyPair keys = ecdsaAlgorithmService.genarateKeys(1024);
+    System.out.println(((BigInteger) keys.getPrivateKey()).toString());
+    Point publicKey = (Point) keys.getPublicKey();
+    System.out.println(publicKey.getX().toString() + " : " + publicKey.getY().toString());
+
+  }
+}

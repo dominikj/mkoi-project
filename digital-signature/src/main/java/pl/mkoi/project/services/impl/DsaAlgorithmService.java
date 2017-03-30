@@ -1,6 +1,5 @@
 package pl.mkoi.project.services.impl;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,6 @@ import pl.mkoi.project.services.SignatureAlgorithmService;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.nio.charset.Charset;
 import java.security.SecureRandom;
 
 @Component("DsaAlgorithmService")
