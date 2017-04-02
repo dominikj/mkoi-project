@@ -1,5 +1,7 @@
 package pl.mkoi.project.points;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -96,6 +98,8 @@ public class Point {
    */
   public Point multiplyByScalar(BigInteger scalar, BigDecimal coefficientA) {
     char[] scalarTable = scalar.toString(2).toCharArray();
+    ArrayUtils.reverse(scalarTable);
+    
     Point multipliedPoint = new Point();
     for (char digit : scalarTable) {
       if ("1".equals(String.valueOf(digit))) {

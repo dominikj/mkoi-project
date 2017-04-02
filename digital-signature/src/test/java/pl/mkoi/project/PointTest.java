@@ -51,7 +51,7 @@ public class PointTest {
     point.setX(new BigDecimal("3"));
     point.setY(new BigDecimal("5"));
    //and scalar 5, coefficient A = -3
-    point.multiplyByScalar(new BigInteger("5"), new BigDecimal("-3"));
+    point.multiplyByScalar(new BigInteger("8"), new BigDecimal("-3"));
     System.out.println(point.getX().toString());
     System.out.println(point.getY().toString());
 

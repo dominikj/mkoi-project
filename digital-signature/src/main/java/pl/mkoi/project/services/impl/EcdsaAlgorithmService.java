@@ -10,6 +10,7 @@ import pl.mkoi.project.keys.EcdsaKeyPair;
 import pl.mkoi.project.keys.KeyPair;
 import pl.mkoi.project.points.Point;
 import pl.mkoi.project.services.SignatureAlgorithmService;
+import pl.mkoi.project.signs.EcdsaSign;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -30,7 +31,7 @@ public class EcdsaAlgorithmService implements SignatureAlgorithmService {
   private BigInteger primeOrderN;
 
   @Value("${ecdsa.coefficient.a}")
-  private  BigDecimal coefficientA;
+  private BigDecimal coefficientA;
 
   private final BigInteger coefficientB;
 
@@ -58,8 +59,35 @@ public class EcdsaAlgorithmService implements SignatureAlgorithmService {
 
   @Override
   public byte[] signFile(byte[] file, KeyPair keys) {
-    cryptoUtils.hash(file);
-    return new byte[0];
+
+    byte[] hashedMessage = cryptoUtils.hash(file);
+    BigInteger privateKey = (BigInteger) keys.getPrivateKey();
+    BigInteger numberK;
+    BigDecimal factorR;
+
+    do {
+      do {
+        numberK = new BigInteger(primeOrderN.bitLength(), new SecureRandom());
+        numberK = numberK.mod(primeOrderN);
+      } while (numberK.compareTo(BigInteger.ZERO) == 0);
+
+      Point pointR = new Point(generatorPoint);
+
+      pointR.multiplyByScalar(numberK, coefficientA);
+
+      factorR = pointR.getX();
+    } while (factorR.compareTo(BigDecimal.ZERO) == 0);
+
+    BigInteger sign = numberK.modInverse(primeOrderN);
+    BigInteger daMultiplyFactorR = privateKey.multiply(factorR.toBigInteger()).mod(primeOrderN);
+    BigInteger hashPlus = (new BigInteger(hashedMessage)).add(daMultiplyFactorR);
+    sign = sign.multiply(hashPlus).mod(primeOrderN);
+
+
+    EcdsaSign signEntity = new EcdsaSign(factorR, sign);
+
+
+    return cryptoUtils.serializeAndCodeByte64(signEntity);
   }
 
   @Override
@@ -80,25 +108,26 @@ public class EcdsaAlgorithmService implements SignatureAlgorithmService {
   @Override
   public boolean verifySign(byte[] file, byte[] sign, KeyPair keys)
       throws ClassNotFoundException, IOException {
-    
+
+    EcdsaSign signEntity = cryptoUtils.decodeBase64AndDeserialize(sign);
+
     BigInteger partS = new BigInteger("123");
     BigInteger partR = new BigInteger("123");
     BigInteger hash = new BigInteger("123");
-    
+
     BigInteger wtmp = partS.modInverse(primeOrderN);
     BigInteger u1 = (hash.multiply(wtmp)).mod(primeOrderN);
     BigInteger u2 = (partR.multiply(wtmp)).mod(primeOrderN);
     Point pointG = new Point(generatorPoint);
     Point point1 = pointG.multiplyByScalar(u1, coefficientA);
-    Point point2 = ((Point)keys.getPublicKey()).multiplyByScalar(u2, coefficientA);
+    Point point2 = ((Point) keys.getPublicKey()).multiplyByScalar(u2, coefficientA);
     Point resultPoint = point1.add(point2);
-    
-    if((partR.mod(primeOrderN)).equals(resultPoint.getX().toBigIntegerExact()))
-    {
+
+    if ((partR.mod(primeOrderN)).equals(resultPoint.getX().toBigInteger())) {
       return true;
     }
-    
-    
+
+
     return false;
   }
 }
