@@ -80,7 +80,25 @@ public class EcdsaAlgorithmService implements SignatureAlgorithmService {
   @Override
   public boolean verifySign(byte[] file, byte[] sign, KeyPair keys)
       throws ClassNotFoundException, IOException {
-    // TODO Auto-generated method stub
+    
+    BigInteger partS = new BigInteger("123");
+    BigInteger partR = new BigInteger("123");
+    BigInteger hash = new BigInteger("123");
+    
+    BigInteger wtmp = partS.modInverse(primeOrderN);
+    BigInteger u1 = (hash.multiply(wtmp)).mod(primeOrderN);
+    BigInteger u2 = (partR.multiply(wtmp)).mod(primeOrderN);
+    Point pointG = new Point(generatorPoint);
+    Point point1 = pointG.multiplyByScalar(u1, coefficientA);
+    Point point2 = ((Point)keys.getPublicKey()).multiplyByScalar(u2, coefficientA);
+    Point resultPoint = point1.add(point2);
+    
+    if((partR.mod(primeOrderN)).equals(resultPoint.getX().toBigIntegerExact()))
+    {
+      return true;
+    }
+    
+    
     return false;
   }
 }
