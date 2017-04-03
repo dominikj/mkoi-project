@@ -65,6 +65,8 @@ public class EcdsaAlgorithmService implements SignatureAlgorithmService {
     BigInteger numberK;
     BigDecimal factorR;
 
+
+
     do {
       do {
         numberK = new BigInteger(primeOrderN.bitLength(), new SecureRandom());
@@ -82,6 +84,24 @@ public class EcdsaAlgorithmService implements SignatureAlgorithmService {
     BigInteger daMultiplyFactorR = privateKey.multiply(factorR.toBigInteger()).mod(primeOrderN);
     BigInteger hashPlus = (new BigInteger(hashedMessage)).add(daMultiplyFactorR);
     sign = sign.multiply(hashPlus).mod(primeOrderN);
+
+
+    /*
+     * do { do { numberK = new BigInteger(primeOrderN.bitLength(), new SecureRandom());
+     * 
+     * } while (numberK.mod(primeOrderN).compareTo(BigInteger.ZERO) == 0);
+     * 
+     * Point pointR = new Point(generatorPoint);
+     * 
+     * pointR.multiplyByScalar(numberK, coefficientA);
+     * 
+     * factorR = pointR.getX().toBigInteger().mod(primeOrderN); } while
+     * (factorR.compareTo(BigInteger.ZERO) == 0);
+     * 
+     * BigInteger sign = ((numberK.modInverse(primeOrderN))
+     * .multiply(hash.add(privateKey.multiply(factorR)).mod(primeOrderN))).mod(primeOrderN);
+     */
+
 
 
     EcdsaSign signEntity = new EcdsaSign(factorR, sign);
@@ -111,23 +131,30 @@ public class EcdsaAlgorithmService implements SignatureAlgorithmService {
 
     EcdsaSign signEntity = cryptoUtils.decodeBase64AndDeserialize(sign);
 
-    BigInteger partS = new BigInteger("123");
-    BigInteger partR = new BigInteger("123");
-    BigInteger hash = new BigInteger("123");
+    BigInteger partS = signEntity.getFactorS();
+    BigInteger partR = signEntity.getFactorR().toBigInteger();
+    BigInteger hash = new BigInteger(cryptoUtils.hash(file));
 
     BigInteger wtmp = partS.modInverse(primeOrderN);
     BigInteger u1 = (hash.multiply(wtmp)).mod(primeOrderN);
-    BigInteger u2 = (partR.multiply(wtmp)).mod(primeOrderN);
+    BigInteger u2 = (partR.multiply(wtmp).mod(primeOrderN));
     Point pointG = new Point(generatorPoint);
     Point point1 = pointG.multiplyByScalar(u1, coefficientA);
     Point point2 = ((Point) keys.getPublicKey()).multiplyByScalar(u2, coefficientA);
     Point resultPoint = point1.add(point2);
 
-    if ((partR.mod(primeOrderN)).equals(resultPoint.getX().toBigInteger())) {
+    if (partR.equals(resultPoint.getX().toBigInteger().mod(primeOrderN))) {
       return true;
+
     }
 
 
+    System.out.println("R: " + partR);
+    System.out.println("X: " + resultPoint.getX().toBigInteger());
+    System.out.println("Xmod: " + resultPoint.getX().toBigInteger().mod(primeOrderN));
+    System.out.println("Rmod: " + partR.mod(primeOrderN));
+    System.out
+        .println("R-X mod: " + resultPoint.getX().toBigInteger().subtract(partR).mod(primeOrderN));
     return false;
   }
 }
