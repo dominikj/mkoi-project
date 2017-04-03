@@ -13,7 +13,6 @@ import pl.mkoi.project.services.SignatureAlgorithmService;
 import pl.mkoi.project.signs.EcdsaSign;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
@@ -31,7 +30,7 @@ public class EcdsaAlgorithmService implements SignatureAlgorithmService {
   private BigInteger primeOrderN;
 
   @Value("${ecdsa.coefficient.a}")
-  private BigDecimal coefficientA;
+  private BigInteger coefficientA;
 
   private final BigInteger coefficientB;
 
@@ -50,8 +49,8 @@ public class EcdsaAlgorithmService implements SignatureAlgorithmService {
     this.cryptoUtils = cryptoUtils;
 
     this.generatorPoint = new Point();
-    this.generatorPoint.setX(new BigDecimal(new BigInteger(generatorPointx, 16)));
-    this.generatorPoint.setY(new BigDecimal(new BigInteger(generatorPointy, 16)));
+    this.generatorPoint.setX(new BigInteger(generatorPointx, 16));
+    this.generatorPoint.setY(new BigInteger(generatorPointy, 16));
     this.coefficientB = new BigInteger(coefficientB, 16);
 
 
@@ -63,7 +62,7 @@ public class EcdsaAlgorithmService implements SignatureAlgorithmService {
     byte[] hashedMessage = cryptoUtils.hash(file);
     BigInteger privateKey = (BigInteger) keys.getPrivateKey();
     BigInteger numberK;
-    BigDecimal factorR;
+    BigInteger factorR;
 
 
 
@@ -78,10 +77,10 @@ public class EcdsaAlgorithmService implements SignatureAlgorithmService {
       pointR.multiplyByScalar(numberK, coefficientA);
 
       factorR = pointR.getX();
-    } while (factorR.compareTo(BigDecimal.ZERO) == 0);
+    } while (factorR.compareTo(BigInteger.ZERO) == 0);
 
     BigInteger sign = numberK.modInverse(primeOrderN);
-    BigInteger daMultiplyFactorR = privateKey.multiply(factorR.toBigInteger()).mod(primeOrderN);
+    BigInteger daMultiplyFactorR = privateKey.multiply(factorR).mod(primeOrderN);
     BigInteger hashPlus = (new BigInteger(hashedMessage)).add(daMultiplyFactorR);
     sign = sign.multiply(hashPlus).mod(primeOrderN);
 
@@ -132,7 +131,7 @@ public class EcdsaAlgorithmService implements SignatureAlgorithmService {
     EcdsaSign signEntity = cryptoUtils.decodeBase64AndDeserialize(sign);
 
     BigInteger partS = signEntity.getFactorS();
-    BigInteger partR = signEntity.getFactorR().toBigInteger();
+    BigInteger partR = signEntity.getFactorR();
     BigInteger hash = new BigInteger(cryptoUtils.hash(file));
 
     BigInteger wtmp = partS.modInverse(primeOrderN);
@@ -143,18 +142,18 @@ public class EcdsaAlgorithmService implements SignatureAlgorithmService {
     Point point2 = ((Point) keys.getPublicKey()).multiplyByScalar(u2, coefficientA);
     Point resultPoint = point1.add(point2);
 
-    if (partR.equals(resultPoint.getX().toBigInteger().mod(primeOrderN))) {
+    // To jest źle samo w sobie! Użyj compareTo() zamiast equals()
+    if (partR.equals(resultPoint.getX().mod(primeOrderN))) {
       return true;
 
     }
 
 
     System.out.println("R: " + partR);
-    System.out.println("X: " + resultPoint.getX().toBigInteger());
-    System.out.println("Xmod: " + resultPoint.getX().toBigInteger().mod(primeOrderN));
+    System.out.println("X: " + resultPoint.getX());
+    System.out.println("Xmod: " + resultPoint.getX().mod(primeOrderN));
     System.out.println("Rmod: " + partR.mod(primeOrderN));
-    System.out
-        .println("R-X mod: " + resultPoint.getX().toBigInteger().subtract(partR).mod(primeOrderN));
+    System.out.println("R-X mod: " + resultPoint.getX().subtract(partR).mod(primeOrderN));
     return false;
   }
 }
