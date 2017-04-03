@@ -65,7 +65,13 @@
 			<artifactId>commons-lang3</artifactId>
 			<version>3.5</version>
 		</dependency>
-
+<dependency>
+         <groupId>ellipticlib</groupId>
+         <artifactId>ellipticlib</artifactId>
+         <scope>system</scope>
+         <version>1.0</version>
+         <systemPath>${basedir}/src/lib/ellipticlib.jar</systemPath>
+      </dependency>
 	</dependencies>
 
 	<build>
