@@ -1,7 +1,5 @@
 package pl.mkoi.project;
 
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Test;
 import pl.mkoi.project.points.Point;
 
@@ -9,52 +7,54 @@ import java.math.BigInteger;
 
 public class PointTest {
 
+  private BigInteger coeffA = new BigInteger("3");
+  private BigInteger coeffB = new BigInteger("5");
+  private BigInteger coorX = new BigInteger("1");
+  private BigInteger coorY = new BigInteger("3");
+  private BigInteger primeP = new BigInteger("7");
+
   @Test
   public void testDoublePoint() {
     Point point = new Point();
-    // let (3,5) and coefficient A = 4
-    point.setX(new BigInteger("3"));
-    point.setY(new BigInteger("5"));
-    point.doublePoint(new BigInteger("4"));
+    point.setX(coorX);
+    point.setY(coorY);
+    point.setCoefficientA(coeffA);
+    point.setCoefficientB(coeffB);
+    point.setPrimeOrderN(primeP);
+    point.doublePoint();
 
-    // px = 3.61
-    // py = -6.891
-    assertTrue(point.getX().compareTo(new BigInteger("3")) == 0);
-    assertTrue(point.getY().compareTo(new BigInteger("-6")) == 0);
   }
 
   @Test
   public void testAddPoints() {
     Point point1 = new Point();
-    Point point2 = new Point();
 
-    // let (3,5)
-    point1.setX(new BigInteger("3"));
-    point1.setY(new BigInteger("5"));
-    // let (2,4)
-    point2.setX(new BigInteger("1"));
-    point2.setY(new BigInteger("4"));
+
+    point1.setX(coorX);
+    point1.setY(coorY);
+    point1.setCoefficientA(coeffA);
+    point1.setCoefficientB(coeffB);
+    point1.setPrimeOrderN(primeP);
+    point1.setGeneratorPoint();
+    Point point2 = new Point(point1);
+    
+    point1.doublePoint();
 
     point1.add(point2);
 
-    // px = -3.75
-    // py = -1.625
-    assertTrue(point1.getX().compareTo(new BigInteger("-3")) == 0);
-    assertTrue(point1.getY().compareTo(new BigInteger("-1")) == 0);
+
   }
 
   @Test
   public void testMultipleByScalar() {
     Point point = new Point();
+    point.setX(coorX);
+    point.setY(coorY);
+    point.setCoefficientA(coeffA);
+    point.setCoefficientB(coeffB);
+    point.setPrimeOrderN(primeP);
 
-    // let (3,5)
-    point.setX(new BigInteger("3"));
-    point.setY(new BigInteger("5"));
-    // and scalar 5, coefficient A = -3
-    point.multiplyByScalar(new BigInteger("8"), new BigInteger("-3"));
-    System.out.println(point.getX().toString());
-    System.out.println(point.getY().toString());
-
+    point.multiplyByScalar(new BigInteger("12"));
 
   }
 }
