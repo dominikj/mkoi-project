@@ -2,10 +2,13 @@ package pl.mkoi.project.keys;
 
 import pl.mkoi.project.points.Point;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 
-public class EcdsaKeyPair implements KeyPair {
+public class EcdsaKeyPair implements KeyPair, Serializable {
 
+  private static final long serialVersionUID = 1L;
+  
   BigInteger privateKey;
   Point publicKey;
 

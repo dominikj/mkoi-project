@@ -39,14 +39,12 @@ public class EcdsaAlgorithmTest {
 
   @InjectMocks
   private EcdsaAlgorithmService ecdsaAlgorithmService =
-      new EcdsaAlgorithmService(cryptoUtils, generatorCoorX, generatorCoorY, coeffB);
+      new EcdsaAlgorithmService(cryptoUtils, generatorCoorX, generatorCoorY, coeffB, coeffA, primeP);
 
   private byte[] fileToTest;
 
   @Before
   public void init() {
-    ReflectionTestUtils.setField(ecdsaAlgorithmService, "primeOrderN", new BigInteger(primeP));
-    ReflectionTestUtils.setField(ecdsaAlgorithmService, "coefficientA", new BigInteger(coeffA));
 
     Point generatorPoint = new Point();
     generatorPoint.setX(new BigInteger(generatorCoorX, 16));
@@ -71,7 +69,7 @@ public class EcdsaAlgorithmTest {
   @Test
   public void testSign() throws IOException, ClassNotFoundException {
     KeyPair keys = ecdsaAlgorithmService.genarateKeys(1024);
-    Path path = Paths.get("src/main/webapp/rsapss.jsp");
+    Path path = Paths.get("src/main/resources/static/css/style.css");
     fileToTest = Files.readAllBytes(path);
 
     byte[] sign = ecdsaAlgorithmService.signFile(fileToTest, (EcdsaKeyPair) keys);

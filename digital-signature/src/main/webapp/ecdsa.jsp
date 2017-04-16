@@ -1,6 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <!DOCTYPE html>
 <html>
 
@@ -9,7 +8,8 @@
 <meta name="description" content="website description" />
 <meta name="keywords" content="website keywords, website keywords" />
 <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-<link rel="stylesheet" type="text/css" href="/css/style.css" />
+<link rel="stylesheet" type="text/css"
+	href=<spring:url value="/css/style.css" /> />
 <!-- modernizr enables HTML5 elements and feature detects -->
 <script type="text/javascript" src="/js/modernizr-1.5.min.js"></script>
 </head>
@@ -32,8 +32,8 @@
 					<ul id="nav">
 						<li><a href="/">Home</a></li>
 						<li><a href="/rsapss">RSA-PSS</a></li>
-						<li class="current"><a href="/dsa">DSA</a></li>
-						<li><a href="/ecdsa">ECDSA</a></li>
+						<li><a href="/dsa">DSA</a></li>
+						<li class="current"><a href="/ecdsa">ECDSA</a></li>
 					</ul>
 				</div>
 				<!--close menubar-->
@@ -85,27 +85,21 @@
 
 			<div id="content">
 				<div class="content_item">
-					<h1>Algorytm DSA</h1>
-					<p>
-						<b>Digital Signature Algorithm</b> to asymetryczny algorytm
-						stworzony przez National Institute of Standards and Technology w
-						1991 roku dla potrzeb Digital Signature Standard.
-					</p>
-					<p>Do wygenerowania kluczy oraz samego podpisu potrzebne są
-						trzy parametry, które mogą być dzielone przez wszystkich
-						użytkowników systemu. Są to: liczba pierwsza P, liczba pierwsza Q
-						oraz generator G. Następnie każdy z użytkowników może wygenerować
-						na podstawie tych trzech stałych swój indywidulany zestaw kluczy -
-						klucz prywatny wykorzystywany do podpisywania dokumentu oraz klucz
-						publiczny potrzebny przy weryfikacji podpisu.</p>
-					<p>Podpis w algorytmie DSA składa się z dwóch elementów - S i
-						R. Dodatkowo do weryfikacji podpisu niezbędne są parametry
-						początkowe - P, Q i G oraz klucz publiczny podpisującego dokument.
-					</p>
-					<p>Przy podpisywaniu dokumentu każdorazowo losowana jest pewna
-						wartość k. Jej unikatowość i pełna przypadkowość jest krytyczna
-						dla bezpieczeństwa całego algorytmu, dlatego istotna jest jakość
-						generatora liczb losowych.</p>
+					<h1>Lorem ipsum</h1>
+					<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+						Proin nibh augue, suscipit a, scelerisque sed, lacinia in, mi.
+						Cras vel lorem. Etiam pellentesque aliquet tellus. Phasellus
+						pharetra nulla ac diam. Quisque semper justo at risus. Donec
+						venenatis, turpis vel hendrerit interdum, dui ligula ultricies
+						purus, sed posuere libero dui id orci. Nam congue, pede vitae
+						dapibus aliquet, elit magna vulputate arcu, vel tempus metus leo
+						non est. Etiam sit amet lectus quis est congue mollis. Phasellus
+						congue lacus eget neque. Phasellus ornare, ante vitae consectetuer
+						consequat, purus sapien ultricies dolor, et mollis pede metus eget
+						nisi. Praesent sodales velit quis augue. Cras suscipit, urna at
+						aliquam rhoncus, urna quam viverra nisi, in interdum massa nibh
+						nec erat.</p>
+
 					<jsp:include page="tabsComponent.jsp" />
 				</div>
 				<!--close content_item-->
@@ -126,8 +120,8 @@
 	</footer>
 
 	<!-- javascript at the bottom for fast page loading -->
-	<script type="text/javascript" src="js/jquery.min.js"></script>
-	<script type="text/javascript" src="js/image_slide.js"></script>
+	<script type="text/javascript" src="/js/jquery.min.js"></script>
+	<script type="text/javascript" src="/js/image_slide.js"></script>
 
 </body>
 </html>

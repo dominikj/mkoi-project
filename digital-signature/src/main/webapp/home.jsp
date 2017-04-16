@@ -31,6 +31,7 @@
 						<li class="current"><a href="/">Home</a></li>
 						<li><a href="/rsapss">RSA-PSS</a></li>
 						<li><a href="/dsa">DSA</a></li>
+						<li><a href="/ecdsa">ECDSA</a></li>
 					</ul>
 				</div>
 				<!--close menubar-->

@@ -2,9 +2,13 @@ package pl.mkoi.project.points;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 
-public class Point {
+public class Point implements Serializable {
+
+  private static final long serialVersionUID = 1L;
+  
   private BigInteger multiplier;
   private BigInteger coordinateX;
   private BigInteger coordinateY;
