@@ -42,7 +42,7 @@ public class EcdsaPageController extends PageController {
   }
 
   @RequestMapping(value = "", method = RequestMethod.GET)
-  public String showRsapssPage(Model model) {
+  public String showEcdsaPage(Model model) {
     model.addAttribute("baseUrl", "/ecdsa");
     return "ecdsa";
   }
@@ -125,8 +125,8 @@ public class EcdsaPageController extends PageController {
     model.addAttribute("signVerified",
         signService.verifySign(file.getBytes(), sign.getBytes(), keypair));
 
-    model.addAttribute("baseUrl", "/rsapss");
-    return "rsapss";
+    model.addAttribute("baseUrl", "/ecdsa");
+    return "ecdsa";
   }
 
 }

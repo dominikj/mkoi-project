@@ -44,7 +44,8 @@
 					<li class="show"><img width="940" height="250"
 						src="images/home_1.jpg"
 						alt="Podpis cyfrowy jest ważną składową współczesnego cyberbezpieczeństwa" /></li>
-					 <li><img width="940" height="250" src="images/home_2.jpg" alt="Współczesny człowiek styka się  z cyberbezpieczeństwem w codziennym życiu" /></li>
+					<li><img width="940" height="250" src="images/home_2.jpg"
+						alt="Współczesny człowiek styka się  z cyberbezpieczeństwem w codziennym życiu" /></li>
 				</ul>
 			</div>
 			<!--close slideshow-->
@@ -102,21 +103,33 @@
 					</ul>
 					</p>
 					<div class="content_container">
-						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-							Pellentesque cursus tempor enim. Aliquam facilisis neque non nunc
-							posuere eget volutpat metus tincidunt.</p>
+						<p>
+							<b>MKOI</b>
+						</p>
+						<p>Celem wykładu jest zaznajomienie słuchaczy ze współczesnymi
+							algorytmami kryptograficznymi oraz metodami matematycznymi
+							wykorzystywanymi w ich konstrukcji i analizie bezpieczeństwa.
+							Wykład dostarcza informacji niezbędnych projektantom i
+							administratorom systemów teleinformatycznych w zakresie
+							stosowanych w nich zabezpieczeń kryptograficznych</p>
 						<div class="button_small">
-							<a href="#">Read more</a>
+							<a
+								href="http://studia.elka.pw.edu.pl/pl/17L/s/eres/eres/wwersje$.startup?Z_ID_PRZEDMIOTU=MKOI">Szczegóły</a>
 						</div>
 						<!--close button_small-->
 					</div>
 					<!--close content_container-->
 					<div class="content_container">
-						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-							Pellentesque cursus tempor enim. Aliquam facilisis neque non nunc
-							posuere eget volutpat metus tincidunt.</p>
+						<p>
+							<b>PKRY</b>
+						</p>
+						<p>Celem wykładu jest przedstawienie możliwości, jakich
+							dostarczają metody kryptograficzne w zakresie zapewnienia
+							bezpieczeństwa komunikacji w sieciach otwartych oraz bezpiecznego
+							realizowania wszelkich usług w sieci.</p>
 						<div class="button_small">
-							<a href="#">Read more</a>
+							<a
+								href="http://studia.elka.pw.edu.pl/pl/16L/s/eres/eres/wwersje$.startup?Z_ID_PRZEDMIOTU=PKRY">Szczegóły</a>
 						</div>
 						<!--close button_small-->
 					</div>

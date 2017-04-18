@@ -85,22 +85,29 @@
 
 			<div id="content">
 				<div class="content_item">
-					<h1>Lorem ipsum</h1>
-					<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-						Proin nibh augue, suscipit a, scelerisque sed, lacinia in, mi.
-						Cras vel lorem. Etiam pellentesque aliquet tellus. Phasellus
-						pharetra nulla ac diam. Quisque semper justo at risus. Donec
-						venenatis, turpis vel hendrerit interdum, dui ligula ultricies
-						purus, sed posuere libero dui id orci. Nam congue, pede vitae
-						dapibus aliquet, elit magna vulputate arcu, vel tempus metus leo
-						non est. Etiam sit amet lectus quis est congue mollis. Phasellus
-						congue lacus eget neque. Phasellus ornare, ante vitae consectetuer
-						consequat, purus sapien ultricies dolor, et mollis pede metus eget
-						nisi. Praesent sodales velit quis augue. Cras suscipit, urna at
-						aliquam rhoncus, urna quam viverra nisi, in interdum massa nibh
-						nec erat.</p>
+					<h1>Algorytm ECDSA</h1>
+					<p>
+						<b>Elliptic Curve Cryptography (ECC)</b> – grupa technik
+						kryptografii asymetrycznej, wykorzystująca jako podstawową
+						technikę matematyczną krzywe eliptyczne. Użycie krzywych
+						eliptycznych w celach kryptograficznych zostało zasugerowane
+						niezależnie przez dwójkę badaczy, Neala Koblitza oraz Victora S.
+						Millera w roku 1985.
+					</p>
+					<p>Bezpieczeństwo ECC jest oparte na złożoności obliczeniowej
+						dyskretnych logarytmów na krzywych eliptycznych – Elliptic Curve
+						Discrete Logarithm Problem (ECDLP). Algorytm podpisu cyfrowego
+						przy użyciu ECC to <i>ECDSA</i>. ECC oferuje bezpieczeństwo porównywalne
+						do RSA przy znacznie krótszych kluczach</p>
+					<p>
+						ECC wykorzystuje działania matematyczne krzywych eliptycznych w
+						ciałach, na liczbach całkowitych i w oparciu o duże liczby
+						pierwsze. W rezultacie ich reprezentacja graficzna nie ma wiele
+						wspólnego ani z krzywymi, ani z elipsami — są to przypominające
+						chmurę zbiory punktów.
+						</p>
 
-					<jsp:include page="tabsComponent.jsp" />
+						<jsp:include page="tabsComponent.jsp" />
 				</div>
 				<!--close content_item-->
 			</div>

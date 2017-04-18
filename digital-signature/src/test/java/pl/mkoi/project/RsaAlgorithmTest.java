@@ -26,9 +26,9 @@ public class RsaAlgorithmTest {
 
   @InjectMocks
   private RsaCryptoService rsacryptoService = new RsaCryptoService(cryptoUtils);
-  
+
   private byte[] fileToTest;
-  
+
   @Test
   public void testGenerateKeys() {
     KeyPair keys = rsacryptoService.generateKeys(1024);
@@ -36,25 +36,14 @@ public class RsaAlgorithmTest {
     assertTrue(keys.getPublicKey().toString().contains(";"));
 
   }
-  
+
   @Test
-  public void testEncryptDecryptFromTable() throws ClassNotFoundException, IOException{
+  public void testEncryptDecryptFromTable() throws ClassNotFoundException, IOException {
     KeyPair keys = rsacryptoService.generateKeys(1024);
-    byte[] message = new byte[]{0,34,43,(byte)250,(byte)130};
-    
+    byte[] message = new byte[] {0, 34, 43, (byte) 250, (byte) 130};
+
     byte[] encrypted = rsacryptoService.encrypt(message, (RsaKey) keys.getPublicKey());
     byte[] decrypted = rsacryptoService.decrypt(encrypted, (RsaKey) keys.getPrivateKey());
-    assertTrue(Arrays.equals(Arrays.copyOfRange(message, 1, message.length),decrypted));
+    assertTrue(Arrays.equals(Arrays.copyOfRange(message, 1, message.length), decrypted));
   }
-  
-  @Test
-  public void testEncryptDecryptFromFile() throws IOException, ClassNotFoundException{
-    Path path = Paths.get("src/main/webapp/home.jsp");
-    fileToTest = Files.readAllBytes(path);
-    KeyPair keys = rsacryptoService.generateKeys(1024);
-    byte[] encrypted = rsacryptoService.encrypt(new BigInteger(fileToTest).toByteArray(), (RsaKey) keys.getPublicKey());
-    byte[] decrypted = rsacryptoService.decrypt(encrypted, (RsaKey) keys.getPrivateKey());
-    assertTrue(Arrays.equals(fileToTest,decrypted));
-  }
-  
 }
